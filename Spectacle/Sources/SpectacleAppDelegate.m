@@ -109,12 +109,11 @@ static BOOL SpectacleIsRunningUnitTests(void)
   _shortcutStorage = [[SpectacleMigratingShortcutStorage alloc] initWithShortcutStorage:[SpectacleShortcutUserDefaultsStorage new]
                                                                    migrationDestination:[SpectacleShortcutJSONStorage new]];
   _shortcutManager = [[SpectacleShortcutManager alloc] initWithShortcutStorage:_shortcutStorage];
+  // A script error is a bug in Spectacle, not something the user can act on, so log it (visible in
+  // Console.app) rather than interrupting them with a modal alert. The action itself fails with the
+  // usual beep because the calculator returns no result.
   SpectacleWindowPositionCalculator *windowPositionCalculator = [[SpectacleWindowPositionCalculator alloc] initWithErrorHandler:^(NSString *errorMessage) {
-    NSAlert *alert = [NSAlert new];
-    alert.alertStyle = NSAlertStyleWarning;
-    alert.messageText = @"Encountered an unexpected error";
-    alert.informativeText = errorMessage;
-    [alert runModal];
+    NSLog(@"Spectacle: window position calculation failed: %@", errorMessage);
   }];
   _windowPositionManager = [[SpectacleWindowPositionManager alloc] initWithScreenDetector:[SpectacleScreenDetector new]
                                                                  windowPositionCalculator:windowPositionCalculator

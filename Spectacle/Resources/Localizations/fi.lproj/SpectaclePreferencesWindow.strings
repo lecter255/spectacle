@@ -24,7 +24,7 @@
 "Ir0-AJ-ldj.title" = "⇧";
 
 /* Class = "NSWindow"; title = "Spectacle X.Y.Z"; ObjectID = "JW4-q9-L7q"; */
-"JW4-q9-L7q.title" = "Spectacle X.Y.Z";
+"JW4-q9-L7q.title" = "Lens X.Y.Z";
 
 /* Class = "NSButtonCell"; title = "Restore Defaults..."; ObjectID = "NT7-Sd-Ofw"; */
 "NT7-Sd-Ofw.title" = "Palauta oletukset...";
@@ -57,7 +57,7 @@
 "aWf-FC-J1j.title" = "taustaohjelmana";
 
 /* Class = "NSButtonCell"; title = "Launch Spectacle at login"; ObjectID = "cEj-mH-kie"; */
-"cEj-mH-kie.title" = "Käynnistä Spectacle kirjauduttaessa";
+"cEj-mH-kie.title" = "Käynnistä Lens kirjauduttaessa";
 
 /* Class = "NSTextFieldCell"; title = "Lower Left:"; ObjectID = "dQP-TR-GMx"; */
 "dQP-TR-GMx.title" = "Alavasen:";

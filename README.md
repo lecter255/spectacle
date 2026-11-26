@@ -1,25 +1,25 @@
-# Spectacle (community fork)
+# Lens
 
 [![CI](https://github.com/lecter255/spectacle/actions/workflows/ci.yml/badge.svg)](https://github.com/lecter255/spectacle/actions/workflows/ci.yml)
 
 Easily organize windows without using a mouse.
 
-## About this fork
+## About Lens
 
-This is an independent, community-maintained fork of [Spectacle](https://github.com/eczarny/spectacle), the macOS window manager created by [Eric Czarny](https://github.com/eczarny). The original project is no longer maintained and its repository has been archived. Its author invited people to "feel free to make Spectacle your own", and this fork aims to keep the app building and working on current versions of macOS and to improve on it from there.
+Lens is a keyboard-first window manager for macOS, inspired by [Spectacle](https://github.com/eczarny/spectacle), the window manager created by [Eric Czarny](https://github.com/eczarny). Spectacle is no longer maintained and its repository has been archived. Its author invited people to "feel free to make Spectacle your own", and Lens started from its code and is being rewritten in Swift with a new interface.
 
-**This fork is not affiliated with, or endorsed by, Eric Czarny or the original Spectacle project.** Please do not report issues with this fork to the original project.
+**Lens is not affiliated with, or endorsed by, Eric Czarny or the original Spectacle project.** Please do not report issues with Lens to the original project.
 
-See [CHANGELOG.md](CHANGELOG.md) for what has changed relative to the last upstream release (1.2).
+See [CHANGELOG.md](CHANGELOG.md) for what has changed relative to the last Spectacle release (1.2).
 
 ## Credits
 
 - **Eric Czarny** created Spectacle and wrote the vast majority of its code over nearly a decade.
 - Everyone who contributed code and fixes to the original project. The full commit history is preserved in this repository; see also the [original contributors list](https://github.com/eczarny/spectacle/graphs/contributors).
-- **[Iiro Jäppinen](http://iiro.jappinen.fi)** designed the icons and other artwork.
+- **[Iiro Jäppinen](http://iiro.jappinen.fi)** designed the original Spectacle icons and artwork. Lens has its own app and menu bar icons.
 - The community translators behind the Finnish, French, Italian, Portuguese and Spanish localizations.
 
-Spectacle is distributed under the MIT License; see [LICENSE.md](LICENSE.md). The original copyright notice is retained as the license requires.
+Lens, like Spectacle, is distributed under the MIT License; see [LICENSE.md](LICENSE.md). The original copyright notice is retained as the license requires.
 
 ## System requirements
 

@@ -104,7 +104,7 @@
 		07BB542C1186662F0045663F /* SpectacleUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = SpectacleUtilities.m; path = Spectacle/Sources/SpectacleUtilities.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		2D1AE52315D715F400EAC5BD /* SpectacleRegisteredShortcutValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SpectacleRegisteredShortcutValidator.h; path = Spectacle/Sources/SpectacleRegisteredShortcutValidator.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		2D1AE52415D715F400EAC5BD /* SpectacleRegisteredShortcutValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = SpectacleRegisteredShortcutValidator.m; path = Spectacle/Sources/SpectacleRegisteredShortcutValidator.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		2D1E1AB0147E06AD0021D73D /* Spectacle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spectacle.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D1E1AB0147E06AD0021D73D /* Spectacle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lens.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D1E1AD2147E07E50021D73D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Spectacle/Supporting Files/Info.plist"; sourceTree = "<group>"; };
 		2D20F0081CD18ED7003DDA5B /* SpectacleBottomHalfWindowCalculationSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SpectacleBottomHalfWindowCalculationSpec.m; path = Sources/SpectacleBottomHalfWindowCalculationSpec.m; sourceTree = "<group>"; };
 		2D20F0091CD18ED7003DDA5B /* SpectacleCenterWindowCalculationSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SpectacleCenterWindowCalculationSpec.m; path = Sources/SpectacleCenterWindowCalculationSpec.m; sourceTree = "<group>"; };
@@ -910,7 +910,8 @@
 				INFOPLIST_FILE = "Spectacle/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.lecter255.Spectacle;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = Spectacle;
+				PRODUCT_NAME = Lens;
 			};
 			name = Debug;
 		};
@@ -923,14 +924,15 @@
 				INFOPLIST_FILE = "Spectacle/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.lecter255.Spectacle;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = Spectacle;
+				PRODUCT_NAME = Lens;
 			};
 			name = Release;
 		};
 		2DA5B7CE19F8BA79007EDE8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Spectacle.app/Contents/MacOS/Spectacle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Lens.app/Contents/MacOS/Lens";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "SpectacleSpecs/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -943,7 +945,7 @@
 		2DA5B7CF19F8BA79007EDE8E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Spectacle.app/Contents/MacOS/Spectacle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Lens.app/Contents/MacOS/Lens";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "SpectacleSpecs/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";

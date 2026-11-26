@@ -281,7 +281,7 @@ struct StatusPanelView: View {
       VStack(spacing: 0) {
         MenuRow(title: "Edit Shortcuts…", detail: nil) { perform(.preferences) }
         MenuRow(title: "More", detail: "▸") { perform(.fullMenu) }
-        MenuRow(title: "Quit Spectacle", detail: "⌘Q") { perform(.quit) }
+        MenuRow(title: "Quit Lens", detail: "⌘Q") { perform(.quit) }
       }
     }
     .padding(14)

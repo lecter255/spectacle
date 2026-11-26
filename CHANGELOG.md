@@ -55,6 +55,9 @@ specific to this fork.
 - **Open System Settings** in the Accessibility prompt now opens Privacy & Security >
   Accessibility directly on every supported macOS version. The old bundled AppleScript drove a
   System Preferences pane that no longer exists and needed an extra Automation permission.
+- The Accessibility access dialog no longer blocks the app. It used to be app-modal, so the menu
+  bar item and preferences were unusable until you clicked a button, and it never noticed when
+  access was granted. It is now an ordinary window that closes itself once access is granted.
 - Fixed a crash when choosing "Disable for *application*" while an app without a bundle
   identifier was frontmost.
 - Fixed an inverted check in `SpectacleShortcutManager -updateShortcut:`. While shortcuts were

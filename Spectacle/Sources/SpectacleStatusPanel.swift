@@ -224,8 +224,8 @@ final class StatusPanelModel: ObservableObject {
   @Published var shortcuts: [String: String] = [:]
 }
 
-private let panelAccent = adaptiveColor(light: 0x5B4BD6, dark: 0xA79CFF)
-private let panelAccentWash = adaptiveColor(light: 0xEFEDFB, dark: 0x332E52)
+let panelAccent = adaptiveColor(light: 0x5B4BD6, dark: 0xA79CFF)
+let panelAccentWash = adaptiveColor(light: 0xEFEDFB, dark: 0x332E52)
 private let stripBackground = adaptiveColor(light: 0xF4F2FD, dark: 0x262338)
 
 struct StatusPanelView: View {

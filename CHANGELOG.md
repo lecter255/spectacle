@@ -8,8 +8,11 @@ specific to this fork.
 
 ### Window management
 
-- Repeated presses of a half or corner shortcut now cycle through 1/2, 2/3, 3/4, 1/4 and 1/3
-  (previously 1/2, 2/3 and 1/3). The shared cycle lives in `SpectacleWindowCalculationHelpers.js`.
+- Halves and corners grow and shrink while the shortcut's modifier keys stay held: after snapping
+  to the left half, → grows the window and ← shrinks it, through 1/4, 1/3, 1/2, 2/3 and 3/4, stopping
+  at either end. Releasing the modifiers ends the adjustment and the next press starts at 1/2. This
+  replaces upstream's wrap-around 1/2 → 2/3 → 1/3 cycle on repeated presses. The logic is
+  `ResizeSession` in SpectacleCore.
 - On screens with an odd pixel width, right-side half and corner positions are now flush with the
   right edge instead of leaving a 1px gap.
 

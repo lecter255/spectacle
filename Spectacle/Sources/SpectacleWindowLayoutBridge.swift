@@ -11,21 +11,27 @@ import Foundation
 public final class SpectacleWindowLayoutBridge: NSObject {
   /// The frame for the window after performing `actionName` (a `kSpectacleWindowAction…`
   /// constant), or `CGRect.null` if the action isn't a layout action (undo, redo, none).
-  @objc(frameForAction:windowRect:visibleFrameOfSourceScreen:visibleFrameOfDestinationScreen:)
+  ///
+  /// For halves and corners the window takes `fractionNumerator / fractionDenominator` of the
+  /// screen along the action's axis; a plain press passes 1/2. Other actions ignore the fraction.
+  @objc(frameForAction:windowRect:visibleFrameOfSourceScreen:visibleFrameOfDestinationScreen:fractionNumerator:fractionDenominator:)
   public static func frame(
     forAction actionName: String,
     windowRect: CGRect,
     visibleFrameOfSourceScreen: CGRect,
-    visibleFrameOfDestinationScreen: CGRect
+    visibleFrameOfDestinationScreen: CGRect,
+    fractionNumerator: Double,
+    fractionDenominator: Double
   ) -> CGRect {
-    guard let action = WindowAction(rawValue: actionName) else {
+    guard let action = WindowAction(rawValue: actionName), fractionDenominator != 0 else {
       return .null
     }
     let frame = WindowLayout.frame(
       for: action,
       window: Rect(windowRect),
       sourceScreen: Rect(visibleFrameOfSourceScreen),
-      destinationScreen: Rect(visibleFrameOfDestinationScreen))
+      destinationScreen: Rect(visibleFrameOfDestinationScreen),
+      fraction: Fraction(numerator: fractionNumerator, denominator: fractionDenominator))
     return CGRect(x: frame.x, y: frame.y, width: frame.width, height: frame.height)
   }
 }

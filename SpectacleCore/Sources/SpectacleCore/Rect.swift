@@ -70,3 +70,25 @@ extension Double {
   /// `rounded()`, which rounds them away from zero.
   var roundedHalfUp: Double { (self + 0.5).rounded(.down) }
 }
+
+/// A share of a screen's width or height, such as 1/2 or 2/3.
+public struct Fraction: Hashable, CustomStringConvertible {
+  public var numerator: Double
+  public var denominator: Double
+
+  public init(numerator: Double, denominator: Double) {
+    self.numerator = numerator
+    self.denominator = denominator
+  }
+
+  public static let oneHalf = Fraction(numerator: 1, denominator: 2)
+
+  /// This share of `length`, rounded down to a whole pixel.
+  public func of(_ length: Double) -> Double {
+    (length * numerator / denominator).floored
+  }
+
+  public var description: String {
+    "\(Int(numerator))/\(Int(denominator))"
+  }
+}

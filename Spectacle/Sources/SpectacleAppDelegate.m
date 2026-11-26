@@ -34,6 +34,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
   NSMutableSet<NSString *> *_disabledApplications;
   BOOL _shortcutsAreDisabledForAnHour;
   SpectacleAccessibilityPermission *_accessibilityPermission;
+  SpectacleDisplaySettingsMenu *_displaySettingsMenu;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
@@ -79,6 +80,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
                                       name:NSWorkspaceDidDeactivateApplicationNotification
                                     object:nil];
   [SpectacleUtilities registerDefaultsForBundle:[NSBundle mainBundle]];
+  [SpectacleAppearance.shared start];
   _shortcutMenuItems = @{
                          @"MoveToCenter": _moveToCenterShortcutMenuItem,
                          @"MoveToFullscreen": _moveToFullscreenShortcutMenuItem,
@@ -121,6 +123,8 @@ static BOOL SpectacleIsRunningUnitTests(void)
   _windowPositionManager = [[SpectacleWindowPositionManager alloc] initWithScreenDetector:[SpectacleScreenDetector new]
                                                                  windowPositionCalculator:windowPositionCalculator
                                                                           sharedWorkspace:[NSWorkspace sharedWorkspace]];
+  _windowPositionManager.showsSnapHUD = YES;
+  [self addDisplaySettingsMenuItems];
   _preferencesController = [[SpectaclePreferencesController alloc] initWithShortcutManager:_shortcutManager
                                                                      windowPositionManager:_windowPositionManager
                                                                            shortcutStorage:_shortcutStorage];
@@ -343,6 +347,24 @@ static BOOL SpectacleIsRunningUnitTests(void)
   }
 }
 
+// Adds the Appearance submenu and the "Show Snap HUD" toggle just above Preferences, until the new
+// settings window takes them over.
+- (void)addDisplaySettingsMenuItems
+{
+  _displaySettingsMenu = [SpectacleDisplaySettingsMenu new];
+  NSInteger index = _statusItemMenu.numberOfItems;
+  for (NSInteger i = 0; i < _statusItemMenu.numberOfItems; i++) {
+    if ([_statusItemMenu itemAtIndex:i].action == @selector(showPreferencesWindow:)) {
+      index = i;
+      break;
+    }
+  }
+  for (NSMenuItem *menuItem in _displaySettingsMenu.menuItems) {
+    [_statusItemMenu insertItem:menuItem atIndex:index++];
+  }
+  [_statusItemMenu insertItem:[NSMenuItem separatorItem] atIndex:index];
+}
+
 - (void)enableStatusItem
 {
   if (_statusItem) {
@@ -427,6 +449,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
 
 - (void)menuWillOpen:(NSMenu *)menu
 {
+  [_displaySettingsMenu refresh];
   NSRunningApplication *frontmostApplication = [NSWorkspace sharedWorkspace].frontmostApplication;
   self.disableShortcutsForApplicationMenuItem.hidden = NO;
   if ([_blacklistedApplications containsObject:frontmostApplication.bundleIdentifier]) {

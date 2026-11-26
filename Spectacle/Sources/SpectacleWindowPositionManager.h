@@ -26,6 +26,9 @@ typedef void (^SpectacleFailureFeedback)(void);
 
 SPECTACLE_INIT_AND_NEW_UNAVAILABLE
 
+// Shows the snap HUD after each layout. Off by default so tests never put up windows.
+@property (nonatomic) BOOL showsSnapHUD;
+
 - (void)moveFrontmostWindowElement:(SpectacleAccessibilityElement *)frontmostWindowElement
                             action:(SpectacleWindowAction *)action
                            screens:(NSArray<NSScreen *> *)screens

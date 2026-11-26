@@ -198,7 +198,7 @@ static const NSEventModifierFlags kCocoaModifierFlagsMask = (NSEventModifierFlag
   NSBezierPath *roundedPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:radius yRadius:radius];
   [NSGraphicsContext.currentContext saveGraphicsState];
   [roundedPath addClip];
-  [[NSColor windowFrameColor] set];
+  [[NSColor separatorColor] set];
   [NSBezierPath fillRect:rect];
   [NSGraphicsContext.currentContext restoreGraphicsState];
 }

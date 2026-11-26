@@ -6,6 +6,14 @@ specific to this fork.
 
 ## Unreleased
 
+### Interface
+
+- A snap HUD appears near the bottom of the screen after each window action, naming the layout and,
+  for halves and corners, the current size, the sizes it steps through, and what pressing again
+  does. It never takes focus or clicks. Turn it off with "Show Snap HUD" in the status menu.
+- Light and dark appearance: the app follows the system setting by default, and the status menu's
+  Appearance submenu can force Light or Dark.
+
 ### Window management
 
 - Halves and corners grow and shrink while the shortcut's modifier keys stay held: after snapping

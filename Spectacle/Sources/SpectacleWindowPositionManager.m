@@ -114,6 +114,16 @@
     _failureFeedback();
     return;
   }
+  if (_showsSnapHUD) {
+    // Both rects are in AppKit's bottom-left-origin coordinates here, before the window rect is
+    // converted back for the accessibility API.
+    [SpectacleSnapHUD.shared showForAction:layout.action
+                         fractionNumerator:layout.fractionNumerator
+                       fractionDenominator:layout.fractionDenominator
+                             sessionActive:_resizeSessionMonitor.isSessionActive
+                                windowRect:frontmostWindowRect
+                      visibleFrameOfScreen:visibleFrameOfDestinationScreen];
+  }
   frontmostWindowRect = [SpectacleAccessibilityElement normalizeCoordinatesOfRect:frontmostWindowRect
                                                                     frameOfScreen:frameOfDestinationScreen];
   historyItem = [SpectacleHistoryItem historyItemFromAccessibilityElement:frontmostWindowElement

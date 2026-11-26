@@ -1,5 +1,7 @@
 # Contributing
 
+Thanks for your interest in this fork of Spectacle! Please report issues and send pull requests to this repository, not to the original (archived) project.
+
 Contributions come in many forms. Creating an issue that documents a previously unreported defect is just as important as sending a pull request. Spectacle can only be great when the folks that use it are passionate about its quality.
 
 Before you start working on your contribution to Spectacle please keep reading. For even more information read [Contributing to Open Source on GitHub][1].
@@ -11,7 +13,7 @@ Before creating a new issue check and make sure somebody hasn't already beat you
 Here are a few things to keep in mind when creating an issue for a potential defect:
 
 * What version of Spectacle did you use when encountering the defect?
-* What version of OS X did you use when encountering the defect?
+* What version of macOS did you use when encountering the defect?
 * Was there any relevant Spectacle output in the [Console][3]?
 
 Including screenshots or videos are extremely helpful so please include them if you can. Diagrams can also be highly valuable when describing a new feature in a feature request.
@@ -19,9 +21,11 @@ Including screenshots or videos are extremely helpful so please include them if 
 ## Pull Requests
 
 1. Fork the repository and create your branch from `master`
-2. Add tests if your changes can and should be tested
-3. Run the test suite and confirm that all tests pass
+2. Add tests if your changes can and should be tested (tests use plain XCTest; see `SpectacleSpecs/`)
+3. Run the test suite and confirm that all tests pass:
+   `xcodebuild -project Spectacle.xcodeproj -scheme Spectacle -destination 'platform=macOS' test`
 4. Rebase your changes on top of the most recent changes from `master`
+5. Make sure the GitHub Actions CI build passes on your pull request
 
 ## Coding Style
 
@@ -32,5 +36,5 @@ To help make it easier maintain Spectacle please match the existing coding style
 By contributing to Spectacle you agree that your contributions will be licensed under its MIT license.
 
 [1]: https://guides.github.com/activities/contributing-to-open-source/#contributing
-[2]: https://github.com/eczarny/spectacle#common-issues
-[3]: https://en.wikipedia.org/wiki/Console_(OS_X)
+[2]: README.md#common-issues
+[3]: https://support.apple.com/guide/console/welcome/mac

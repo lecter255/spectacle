@@ -1,20 +1,29 @@
-# Spectacle
+# Spectacle (community fork)
 
-[![Build Status](https://travis-ci.org/eczarny/spectacle.svg?branch=master)](https://travis-ci.org/eczarny/spectacle)
+[![CI](https://github.com/lecter255/spectacle/actions/workflows/ci.yml/badge.svg)](https://github.com/lecter255/spectacle/actions/workflows/ci.yml)
 
 Easily organize windows without using a mouse.
 
-## Important Note
+## About this fork
 
-**This project is not being actively maintained.** Unfortunately, after almost a decade of on-and-off development I can no longer dedicate the time needed to be a responsible maintainer of this project. Spectacle will remain available for download but please use at your own risk. The source code will continue to be free and open to anyone, so feel free to make Spectacle your own.
+This is an independent, community-maintained fork of [Spectacle](https://github.com/eczarny/spectacle), the macOS window manager created by [Eric Czarny](https://github.com/eczarny). The original project is no longer maintained and its repository has been archived. Its author invited people to "feel free to make Spectacle your own", and this fork aims to keep the app building and working on current versions of macOS and to improve on it from there.
 
-Thanks to all the folks that have made Spectacle the first app they install a new Mac!
+**This fork is not affiliated with, or endorsed by, Eric Czarny or the original Spectacle project.** Please do not report issues with this fork to the original project.
 
-_Spectacle users have recommended [Rectangle](https://github.com/rxhanson/Rectangle) as an open source alternative._
+See [CHANGELOG.md](CHANGELOG.md) for what has changed relative to the last upstream release (1.2).
+
+## Credits
+
+- **Eric Czarny** created Spectacle and wrote the vast majority of its code over nearly a decade.
+- Everyone who contributed code and fixes to the original project. The full commit history is preserved in this repository; see also the [original contributors list](https://github.com/eczarny/spectacle/graphs/contributors).
+- **[Iiro Jäppinen](http://iiro.jappinen.fi)** designed the icons and other artwork.
+- The community translators behind the Finnish, French, Italian, Portuguese and Spanish localizations.
+
+Spectacle is distributed under the MIT License; see [LICENSE.md](LICENSE.md). The original copyright notice is retained as the license requires.
 
 ## System requirements
 
-Spectacle [0.8.6][1] is the last version to support Mac OS X 10.7; future releases will only support 10.9 or greater. Folks wishing to stay on 10.7 should download [0.8.6][1]. Those looking for a version of Spectacle that supports 10.6 can still download [0.7][2].
+macOS 10.13 (High Sierra) or later. Building requires a recent version of Xcode (CI builds with the default Xcode on GitHub's `macos-15` runner).
 
 ## Keyboard Shortcuts
 
@@ -65,11 +74,13 @@ Spectacle remembers where every window was prior to executing a window action. T
 
 ### Spectacle is requesting access to use accessibility features
 
-Apple's [OS X Accessibility Protocol][4] makes Spectacle possible. This protocol allows assistive applications to _drive the user interface of another application running in OS X_. In order to do its job Spectacle must be granted access to use these accessibility features. Instructions to do so will be displayed if Spectacle determines it does not have sufficient privileges.
+Apple's [macOS Accessibility API][4] makes Spectacle possible. It allows assistive applications to _drive the user interface of another application_. In order to do its job Spectacle must be granted access in **System Settings → Privacy & Security → Accessibility** (or **System Preferences → Security & Privacy → Privacy → Accessibility** on older macOS releases). Spectacle shows a prompt with a button that opens the right pane if it does not have sufficient privileges.
+
+Because this fork uses its own bundle identifier, macOS treats it as a different app from the original Spectacle: you will need to grant it Accessibility access separately, and it does not share the original app's preferences.
 
 ### Spectacle does not resize a particular window as expected
 
-OS X allows applications to place constraints on the size of its windows. This allows application developers to design their user interfaces without needing to worry about supporting every possible window dimension. In these cases Spectacle will not be able to resize those windows to fit into the exact dimensions intended by the shortcut used.
+macOS allows applications to place constraints on the size of its windows. This allows application developers to design their user interfaces without needing to worry about supporting every possible window dimension. In these cases Spectacle will not be able to resize those windows to fit into the exact dimensions intended by the shortcut used.
 
 As an example suppose a display has a 2880x1800 resolution and a window is being resized to fit the left half of the display. If the window has specified a minimum allowable width of 1600 pixels Spectacle will not be able to resize the window to fit the expected 1440 pixels. The constraints placed on windows will always be respected despite leading to potentially unexpected results; in this example Spectacle will resize the window's width to 1600 pixels.
 
@@ -81,28 +92,27 @@ To work around the limitations imposed on Terminal windows Spectacle will first 
 
 ### Spectacle does not work with all applications
 
-Most applications built with the Cocoa frameworks can be readily manipulated via the _OS X Accessibility Protocol_; allowing Spectacle to interact with nearly every window it encounters. Unfortunately this is not always the case. Spectacle will be unable to manipulate the windows of applications that build their user interfaces in unexpected ways.
+Most applications built with the Cocoa frameworks can be readily manipulated via the _macOS Accessibility API_; allowing Spectacle to interact with nearly every window it encounters. Unfortunately this is not always the case. Spectacle will be unable to manipulate the windows of applications that build their user interfaces in unexpected ways.
 
 ## Building and running
 
-Spectacle uses [Carthage][5]. Before building Spectacle in Xcode run:
-
-    $ carthage bootstrap --platform Mac
-
-Once Carthage builds Spectacle's dependencies open the Xcode project:
+The project has no third-party dependencies. Open the project in Xcode and press &#8984;R:
 
     $ open Spectacle.xcodeproj
 
-After Xcode finishes loading the workspace press &#8984;R to run Spectacle.
+To build and run the test suite from the command line:
 
-# License
+    $ xcodebuild -project Spectacle.xcodeproj -scheme Spectacle -destination 'platform=macOS' test
 
-Copyright (c) 2017 Eric Czarny.
+Every push and pull request is built and tested by [GitHub Actions](.github/workflows/ci.yml).
 
-Spectacle should be accompanied by a LICENSE file containing the license relevant to this distribution.
+When you run a development build for the first time, macOS will ask you to grant it Accessibility access. Ad-hoc signed builds are treated as a new app each time their signature changes, so you may need to remove and re-add the entry in the Accessibility settings after rebuilding.
 
-[1]: https://s3.amazonaws.com/spectacle/downloads/Spectacle+0.8.6.zip
-[2]: https://s3.amazonaws.com/spectacle/downloads/Spectacle+0.7.zip
-[3]: http://support.apple.com/kb/ht1343
-[4]: https://developer.apple.com/library/mac/documentation/Accessibility/Conceptual/AccessibilityMacOSX/OSXAXmodel.html
-[5]: https://github.com/Carthage/Carthage
+## License
+
+Copyright (c) 2017 Eric Czarny, and contributors to this fork.
+
+Spectacle is released under the MIT License. See [LICENSE.md](LICENSE.md) for the full text.
+
+[3]: https://support.apple.com/HT201236
+[4]: https://developer.apple.com/documentation/applicationservices/axuielement_h

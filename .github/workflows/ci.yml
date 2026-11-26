@@ -69,9 +69,9 @@ jobs:
 
       - name: Package Release build
         run: |
-          app="build/Build/Products/Release/Spectacle.app"
+          app="build/Build/Products/Release/Lens.app"
           test -d "$app"
-          ditto -c -k --keepParent "$app" Spectacle.zip
+          ditto -c -k --keepParent "$app" Lens.zip
 
       # An unsigned, un-notarized test build for trying changes on a real Mac. Not a release: macOS
       # will refuse to open it until you right-click it and choose Open (or clear the quarantine flag).
@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Spectacle-unsigned-${{ github.sha }}
-          path: Spectacle.zip
+          path: Lens.zip
           retention-days: 14
 
       - name: Upload test results

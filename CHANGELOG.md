@@ -6,6 +6,12 @@ specific to this fork.
 
 ## Unreleased
 
+### Name and icon
+
+- The app is now called **Lens**, with a new app icon (a lens with its left half tinted) and a
+  matching menu bar icon. The app file is `Lens.app`. The bundle identifier is unchanged, so
+  existing shortcuts, settings and the Accessibility permission carry over.
+
 ### Interface
 
 - Choose which sizes a held-key resize steps through: the settings inspector for any half or

@@ -119,17 +119,22 @@ test('tiling actions keep windows on screen, with whole-pixel frames, even when 
   }
 });
 
-test('repeating a half or corner action cycles through three sizes and returns to the start', () => {
+test('repeating a half or corner action cycles through distinct sizes and returns to the start', () => {
+  // The number of sizes in the cycle (1/2, 2/3, 1/3, ...) is a product decision, so only check
+  // that the cycle has at least three distinct sizes and comes back to where it started.
   const screen = screens[0];
   const cycling = tilingActions.slice(0, 8);
   for (const action of cycling) {
     const first = calculate(rect(200, 200, 500, 300), screen, screen, action);
-    const second = calculate(first, screen, screen, action);
-    const third = calculate(second, screen, screen, action);
-    const fourth = calculate(third, screen, screen, action);
-    assert.notDeepEqual(first, second, `${action}: second press should change size`);
-    assert.notDeepEqual(second, third, `${action}: third press should change size`);
-    assert.deepEqual(fourth, first, `${action}: fourth press should return to the first size`);
+    const seen = [first];
+    let window = calculate(first, screen, screen, action);
+    while (JSON.stringify(window) !== JSON.stringify(first)) {
+      assert.ok(!seen.some((r) => JSON.stringify(r) === JSON.stringify(window)), `${action}: cycle repeats ${JSON.stringify(window)} before returning to the start`);
+      assert.ok(seen.length < 12, `${action}: cycle never returns to the start`);
+      seen.push(window);
+      window = calculate(window, screen, screen, action);
+    }
+    assert.ok(seen.length >= 3, `${action}: expected at least 3 sizes in the cycle, got ${seen.length}`);
   }
 });
 

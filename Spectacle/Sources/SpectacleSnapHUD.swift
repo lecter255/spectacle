@@ -130,7 +130,7 @@ public final class SpectacleSnapHUD: NSObject {
     background.material = .hudWindow
     background.blendingMode = .behindWindow
     background.state = .active
-    background.maskImage = Self.roundedMask(radius: Self.cornerRadius)
+    background.maskImage = roundedMask(radius: Self.cornerRadius)
 
     let hostingView = NSHostingView(rootView: SnapHUDView(feedback: nil))
     hostingView.translatesAutoresizingMaskIntoConstraints = false
@@ -147,39 +147,10 @@ public final class SpectacleSnapHUD: NSObject {
     self.hostingView = hostingView
     return panel
   }
-
-  /// A stretchable rounded-rectangle mask, so the blur gets rounded corners at any size.
-  private static func roundedMask(radius: CGFloat) -> NSImage {
-    let edge = radius * 2 + 1
-    let image = NSImage(size: NSSize(width: edge, height: edge), flipped: false) { rect in
-      NSColor.black.setFill()
-      NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).fill()
-      return true
-    }
-    image.capInsets = NSEdgeInsets(top: radius, left: radius, bottom: radius, right: radius)
-    image.resizingMode = .stretch
-    return image
-  }
-}
-
-private extension Rect {
-  init(_ rect: CGRect) {
-    self.init(
-      x: Double(rect.origin.x),
-      y: Double(rect.origin.y),
-      width: Double(rect.size.width),
-      height: Double(rect.size.height)
-    )
-  }
 }
 
 /// The HUD's accent: a teal that reads on the dark blur, deepened for the light one.
-private let hudAccent = Color(NSColor(name: nil) { appearance in
-  let isDark = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
-  return isDark
-    ? NSColor(srgbRed: 0x5F / 255.0, green: 0xD6 / 255.0, blue: 0xB6 / 255.0, alpha: 1)
-    : NSColor(srgbRed: 0x14 / 255.0, green: 0x8F / 255.0, blue: 0x73 / 255.0, alpha: 1)
-})
+private let hudAccent = adaptiveColor(light: 0x148F73, dark: 0x5FD6B6)
 
 struct SnapHUDView: View {
   let feedback: SnapFeedback?

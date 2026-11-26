@@ -7,6 +7,7 @@
 #import "SpectacleMigratingShortcutStorage.h"
 #import "SpectaclePreferencesController.h"
 #import "SpectacleScreenDetector.h"
+#import "SpectacleShortcut.h"
 #import "SpectacleShortcutJSONStorage.h"
 #import "SpectacleShortcutManager.h"
 #import "SpectacleShortcutTranslations.h"
@@ -21,8 +22,12 @@ static BOOL SpectacleIsRunningUnitTests(void)
     || NSClassFromString(@"XCTestCase") != Nil;
 }
 
+@interface SpectacleAppDelegate () <SpectacleStatusPanelDelegate>
+@end
+
 @implementation SpectacleAppDelegate
 {
+  SpectacleStatusPanel *_statusPanel;
   NSDictionary<NSString *, NSMenuItem *> *_shortcutMenuItems;
   NSStatusItem *_statusItem;
   id<SpectacleShortcutStorage> _shortcutStorage;
@@ -375,7 +380,88 @@ static BOOL SpectacleIsRunningUnitTests(void)
   [statusImage setTemplate:YES];
   _statusItem.button.image = statusImage;
   _statusItem.button.toolTip = [@"Spectacle " stringByAppendingString:SpectacleUtilities.applicationVersion];
+  // A click opens the layout panel; a right-click or Control-click opens the full menu.
+  _statusItem.button.target = self;
+  _statusItem.button.action = @selector(statusItemClicked:);
+  [_statusItem.button sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskRightMouseUp];
+  if (!_statusPanel) {
+    _statusPanel = [SpectacleStatusPanel new];
+    _statusPanel.delegate = self;
+  }
+}
+
+- (void)statusItemClicked:(id)sender
+{
+  NSEvent *event = NSApp.currentEvent;
+  BOOL wantsFullMenu = event.type == NSEventTypeRightMouseUp
+    || (event.modifierFlags & NSEventModifierFlagControl) != 0;
+  if (wantsFullMenu) {
+    [_statusPanel close];
+    [self statusPanelShowFullMenu];
+  } else {
+    [_statusPanel toggleRelativeTo:_statusItem.button];
+  }
+}
+
+#pragma mark - SpectacleStatusPanelDelegate
+
+- (void)statusPanelPerformAction:(NSString *)actionName
+{
+  [_windowPositionManager moveFrontmostWindowElement:[SpectacleAccessibilityElement frontmostWindowElement]
+                                              action:actionName];
+}
+
+- (void)statusPanelPerformAction:(NSString *)actionName
+               fractionNumerator:(double)fractionNumerator
+             fractionDenominator:(double)fractionDenominator
+{
+  [_windowPositionManager moveFrontmostWindowElement:[SpectacleAccessibilityElement frontmostWindowElement]
+                                              action:actionName
+                                   fractionNumerator:fractionNumerator
+                                 fractionDenominator:fractionDenominator];
+}
+
+- (void)statusPanelUndo
+{
+  [_windowPositionManager undoLastWindowAction];
+}
+
+- (void)statusPanelShowPreferences
+{
+  [NSApp activateIgnoringOtherApps:YES];
+  [self showPreferencesWindow:self];
+}
+
+- (void)statusPanelShowFullMenu
+{
+  if (!_statusItem) {
+    return;
+  }
+  // Attaching the menu only while it is open keeps plain clicks going to the panel. The click
+  // tracks the menu until it closes.
   _statusItem.menu = _statusItemMenu;
+  [_statusItem.button performClick:nil];
+  _statusItem.menu = nil;
+}
+
+- (CGRect)statusPanelFrontmostWindowRect
+{
+  SpectacleAccessibilityElement *frontmostWindowElement = [SpectacleAccessibilityElement frontmostWindowElement];
+  if (!frontmostWindowElement || frontmostWindowElement.isSheet || frontmostWindowElement.isSystemDialog) {
+    return CGRectNull;
+  }
+  return [frontmostWindowElement rectOfElement];
+}
+
+- (NSDictionary<NSString *, NSString *> *)statusPanelShortcutDisplayStrings
+{
+  NSMutableDictionary<NSString *, NSString *> *displayStrings = [NSMutableDictionary new];
+  for (SpectacleShortcut *shortcut in _shortcutManager.shortcuts) {
+    if (!shortcut.isClearedShortcut && shortcut.windowAction && shortcut.displayString) {
+      displayStrings[shortcut.windowAction] = shortcut.displayString;
+    }
+  }
+  return displayStrings;
 }
 
 - (void)disableStatusItem
@@ -383,6 +469,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
   if (!_statusItem) {
     return;
   }
+  [_statusPanel close];
   [NSStatusBar.systemStatusBar removeStatusItem:_statusItem];
   _statusItem = nil;
 }

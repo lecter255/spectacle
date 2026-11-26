@@ -72,6 +72,8 @@
 		3CA128B6F943C490E14DBA27 /* SnapFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC041A2245365E5A06A2CE0 /* SnapFeedback.swift */; };
 		335DEAC1F0ACDF0577A66F69 /* SpectacleSnapHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A57E472E9762C94DE1A2600 /* SpectacleSnapHUD.swift */; };
 		72F8FEA32053EBFB820BE4EC /* SpectacleAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70CDA9811447AFBFF754840 /* SpectacleAppearance.swift */; };
+		2BE909D0620235F150528101 /* LayoutMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345901C225688904233286BD /* LayoutMatch.swift */; };
+		87E3C623E9B8C484601D9C85 /* SpectacleStatusPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C014F5305D87A413587DB98B /* SpectacleStatusPanel.swift */; };
 		9F29C5085EB93BAB51CEEA64 /* SpectacleResizeSessionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CCC013F69F1465BC3E5AE1 /* SpectacleResizeSessionMonitor.swift */; };
 		83C55128225C57C9A9C8FC4C /* SpectacleAccessibilityPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AE708730390AED29FF9956 /* SpectacleAccessibilityPermission.swift */; };
 		29D02FC9F7A38CD23B52FAD0 /* ScreenSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D035EF52BF983B531D7D867 /* ScreenSelection.swift */; };
@@ -217,6 +219,8 @@
 		4BC041A2245365E5A06A2CE0 /* SnapFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapFeedback.swift; path = SpectacleCore/Sources/SpectacleCore/SnapFeedback.swift; sourceTree = "<group>"; };
 		5A57E472E9762C94DE1A2600 /* SpectacleSnapHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleSnapHUD.swift; path = Spectacle/Sources/SpectacleSnapHUD.swift; sourceTree = "<group>"; };
 		E70CDA9811447AFBFF754840 /* SpectacleAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleAppearance.swift; path = Spectacle/Sources/SpectacleAppearance.swift; sourceTree = "<group>"; };
+		345901C225688904233286BD /* LayoutMatch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LayoutMatch.swift; path = SpectacleCore/Sources/SpectacleCore/LayoutMatch.swift; sourceTree = "<group>"; };
+		C014F5305D87A413587DB98B /* SpectacleStatusPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleStatusPanel.swift; path = Spectacle/Sources/SpectacleStatusPanel.swift; sourceTree = "<group>"; };
 		36CCC013F69F1465BC3E5AE1 /* SpectacleResizeSessionMonitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleResizeSessionMonitor.swift; path = Spectacle/Sources/SpectacleResizeSessionMonitor.swift; sourceTree = "<group>"; };
 		02AE708730390AED29FF9956 /* SpectacleAccessibilityPermission.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleAccessibilityPermission.swift; path = Spectacle/Sources/SpectacleAccessibilityPermission.swift; sourceTree = "<group>"; };
 		1D035EF52BF983B531D7D867 /* ScreenSelection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScreenSelection.swift; path = SpectacleCore/Sources/SpectacleCore/ScreenSelection.swift; sourceTree = "<group>"; };
@@ -367,6 +371,7 @@
 				68761428070F746922ED5830 /* SpectacleWindowLayoutBridge.swift */,
 				5A57E472E9762C94DE1A2600 /* SpectacleSnapHUD.swift */,
 				E70CDA9811447AFBFF754840 /* SpectacleAppearance.swift */,
+				C014F5305D87A413587DB98B /* SpectacleStatusPanel.swift */,
 				36CCC013F69F1465BC3E5AE1 /* SpectacleResizeSessionMonitor.swift */,
 				2D98D72F1AE064B7007AD995 /* SpectacleWindowPositionCalculationResult.h */,
 				2D98D7301AE064B7007AD995 /* SpectacleWindowPositionCalculationResult.m */,
@@ -506,6 +511,7 @@
 				1D035EF52BF983B531D7D867 /* ScreenSelection.swift */,
 				BE24BD1D5136E53BB76DFD08 /* Rect.swift */,
 				4BC041A2245365E5A06A2CE0 /* SnapFeedback.swift */,
+				345901C225688904233286BD /* LayoutMatch.swift */,
 				AED767729C9CE74265F67663 /* ResizeSession.swift */,
 				48DED59E451E734BEEC4291C /* WindowAction.swift */,
 				EFB2ADD347F838CD12F66DC1 /* WindowLayout.swift */,
@@ -677,6 +683,8 @@
 				3CA128B6F943C490E14DBA27 /* SnapFeedback.swift in Sources */,
 				335DEAC1F0ACDF0577A66F69 /* SpectacleSnapHUD.swift in Sources */,
 				72F8FEA32053EBFB820BE4EC /* SpectacleAppearance.swift in Sources */,
+				2BE909D0620235F150528101 /* LayoutMatch.swift in Sources */,
+				87E3C623E9B8C484601D9C85 /* SpectacleStatusPanel.swift in Sources */,
 				9F29C5085EB93BAB51CEEA64 /* SpectacleResizeSessionMonitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

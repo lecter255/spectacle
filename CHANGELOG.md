@@ -8,6 +8,11 @@ specific to this fork.
 
 ### Interface
 
+- Clicking the menu bar icon opens a layout panel instead of a long menu: a grid of 12 layouts
+  for the front window with its current layout highlighted, its size with one-click size chips
+  (¼ ⅓ ½ ⅔ ¾) for halves and corners, Display and Undo buttons, Edit Shortcuts and Quit. The panel
+  never steals focus from the window being moved. Right-click (or Control-click) the icon, or
+  choose More in the panel, for the full menu.
 - A snap HUD appears near the bottom of the screen after each window action, naming the layout and,
   for halves and corners, the current size, the sizes it steps through, and what pressing again
   does. It never takes focus or clicks. Turn it off with "Show Snap HUD" in the status menu.

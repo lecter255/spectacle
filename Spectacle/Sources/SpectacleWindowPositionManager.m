@@ -1,5 +1,6 @@
 #import "SpectacleWindowPositionManager.h"
 
+#import "Spectacle-Swift.h"
 #import "SpectacleAccessibilityElement.h"
 #import "SpectacleBestEffortWindowMover.h"
 #import "SpectacleHistory.h"
@@ -20,6 +21,8 @@
   NSWorkspace *_sharedWorkspace;
   SpectacleFailureFeedback _failureFeedback;
   id<SpectacleWindowMover> _windowMover;
+  // Grows and shrinks halves and corners while a shortcut's modifier keys stay held.
+  SpectacleResizeSessionMonitor *_resizeSessionMonitor;
 }
 
 - (instancetype)initWithScreenDetector:(SpectacleScreenDetector *)screenDetector
@@ -35,6 +38,7 @@
     _sharedWorkspace = sharedWorkspace;
     _failureFeedback = failureFeedback;
     _windowMover = windowMover;
+    _resizeSessionMonitor = [SpectacleResizeSessionMonitor new];
   }
   return self;
 }
@@ -91,10 +95,15 @@
   frontmostWindowRect = [SpectacleAccessibilityElement normalizeCoordinatesOfRect:frontmostWindowRect
                                                                     frameOfScreen:frameOfDestinationScreen];
   previousFrontmostWindowRect = frontmostWindowRect;
+  // During a resize session a half or corner press grows or shrinks the session's half instead of
+  // moving the window, so the layout's action can differ from the one pressed.
+  SpectacleResizeLayout *layout = [_resizeSessionMonitor layoutForAction:action];
   windowPositionCalculationResult = [_windowPositionCalculator calculateWindowRect:frontmostWindowRect
                                                         visibleFrameOfSourceScreen:visibleFrameOfSourceScreen
                                                    visibleFrameOfDestinationScreen:visibleFrameOfDestinationScreen
-                                                                            action:action];
+                                                                            action:layout.action
+                                                                 fractionNumerator:layout.fractionNumerator
+                                                               fractionDenominator:layout.fractionDenominator];
   if (!windowPositionCalculationResult) {
     _failureFeedback();
     return;
@@ -120,6 +129,9 @@
 - (void)moveFrontmostWindowElement:(SpectacleAccessibilityElement *)frontmostWindowElement
                             action:(SpectacleWindowAction *)action
 {
+  if (SpectacleIsUndoWindowAction(action) || SpectacleIsRedoWindowAction(action)) {
+    [_resizeSessionMonitor endSession];
+  }
   if (SpectacleIsUndoWindowAction(action)) {
     [self undoLastWindowAction];
   } else if (SpectacleIsRedoWindowAction(action)) {

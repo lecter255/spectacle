@@ -18,10 +18,27 @@
                                   visibleFrameOfDestinationScreen:(CGRect)visibleFrameOfDestinationScreen
                                                            action:(SpectacleWindowAction *)action
 {
+  return [self calculateWindowRect:windowRect
+        visibleFrameOfSourceScreen:visibleFrameOfSourceScreen
+   visibleFrameOfDestinationScreen:visibleFrameOfDestinationScreen
+                            action:action
+                 fractionNumerator:1
+               fractionDenominator:2];
+}
+
+- (SpectacleWindowPositionCalculationResult *)calculateWindowRect:(CGRect)windowRect
+                                       visibleFrameOfSourceScreen:(CGRect)visibleFrameOfSourceScreen
+                                  visibleFrameOfDestinationScreen:(CGRect)visibleFrameOfDestinationScreen
+                                                           action:(SpectacleWindowAction *)action
+                                                fractionNumerator:(double)fractionNumerator
+                                              fractionDenominator:(double)fractionDenominator
+{
   CGRect calculatedWindowRect = [SpectacleWindowLayoutBridge frameForAction:action
                                                                  windowRect:windowRect
                                                  visibleFrameOfSourceScreen:visibleFrameOfSourceScreen
-                                            visibleFrameOfDestinationScreen:visibleFrameOfDestinationScreen];
+                                            visibleFrameOfDestinationScreen:visibleFrameOfDestinationScreen
+                                                          fractionNumerator:fractionNumerator
+                                                        fractionDenominator:fractionDenominator];
   if (CGRectIsNull(calculatedWindowRect)) {
     return nil;
   }

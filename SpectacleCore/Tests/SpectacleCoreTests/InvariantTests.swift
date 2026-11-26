@@ -34,20 +34,39 @@ final class InvariantTests: XCTestCase {
     }
   }
 
-  func testHalvesAndCornersCycleThroughDistinctSizesAndReturnToTheStart() {
-    let screen = screens[0]
-    for action in tilingActions.prefix(8) {
-      let first = WindowLayout.frame(for: action, window: Rect(x: 200, y: 200, width: 500, height: 300), sourceScreen: screen, destinationScreen: screen)
-      var seen = [first]
-      var window = WindowLayout.frame(for: action, window: first, sourceScreen: screen, destinationScreen: screen)
-      while window != first {
-        XCTAssertFalse(seen.contains(window), "\(action): cycle repeats \(window) before returning to the start")
-        XCTAssertLessThan(seen.count, 12, "\(action): cycle never returns to the start")
-        if seen.contains(window) || seen.count >= 12 { break }
-        seen.append(window)
-        window = WindowLayout.frame(for: action, window: window, sourceScreen: screen, destinationScreen: screen)
+  func testRepeatingAPlainHalfOrCornerPressStaysAtOneHalf() {
+    // Sizes other than 1/2 only come from a ResizeSession while the modifiers stay held; a plain
+    // press always lands on 1/2, however many times it is repeated.
+    for screen in screens {
+      for action in tilingActions.prefix(8) {
+        let first = WindowLayout.frame(for: action, window: Rect(x: 200, y: 200, width: 500, height: 300), sourceScreen: screen, destinationScreen: screen)
+        let again = WindowLayout.frame(for: action, window: first, sourceScreen: screen, destinationScreen: screen)
+        XCTAssertEqual(again, first, "\(action) on \(screen)")
       }
-      XCTAssertEqual(seen.count, WindowLayout.resizeCycle.count, "\(action): cycle length")
+    }
+  }
+
+  func testEverySessionSizeKeepsHalvesAndCornersOnScreenAndAnchored() {
+    for screen in screens {
+      for action in tilingActions.prefix(8) {
+        let half = WindowLayout.frame(for: action, window: screen, sourceScreen: screen, destinationScreen: screen)
+        var previousLength = 0.0
+        for fraction in ResizeSession.sizes {
+          let window = WindowLayout.frame(for: action, window: half, sourceScreen: screen, destinationScreen: screen, fraction: fraction)
+          XCTAssertTrue(screen.contains(window), "\(action) at \(fraction) on \(screen) produced \(window)")
+          // The anchored edge never moves; only the free edge does.
+          switch action {
+          case .leftHalf, .upperLeft, .lowerLeft: XCTAssertEqual(window.minX, half.minX)
+          case .rightHalf, .upperRight, .lowerRight: XCTAssertEqual(window.maxX, half.maxX)
+          case .topHalf: XCTAssertEqual(window.maxY, half.maxY)
+          case .bottomHalf: XCTAssertEqual(window.minY, half.minY)
+          default: break
+          }
+          let length = (action == .topHalf || action == .bottomHalf) ? window.height : window.width
+          XCTAssertGreaterThan(length, previousLength, "\(action): sizes should grow from 1/4 to 3/4")
+          previousLength = length
+        }
+      }
     }
   }
 

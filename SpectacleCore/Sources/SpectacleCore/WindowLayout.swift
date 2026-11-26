@@ -11,11 +11,16 @@ public enum WindowLayout {
   ///   - sourceScreen: The visible frame of the screen the window is on now.
   ///   - destinationScreen: The visible frame of the screen the window should end up on. The same
   ///     as `sourceScreen` except for the next and previous display actions.
+  ///   - fraction: For halves and corners, the share of the screen the window takes along the
+  ///     action's axis (its width for left, right and the corners; its height for top and bottom).
+  ///     A plain press is 1/2; `ResizeSession` picks other sizes while the modifiers stay held.
+  ///     Ignored by every other action.
   public static func frame(
     for action: WindowAction,
     window: Rect,
     sourceScreen: Rect,
-    destinationScreen screen: Rect
+    destinationScreen screen: Rect,
+    fraction: Fraction = .oneHalf
   ) -> Rect {
     switch action {
     case .center:
@@ -23,33 +28,33 @@ public enum WindowLayout {
     case .fullscreen:
       return screen
     case .leftHalf:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.width = fraction.of(screen.width)
         return rect
       }
     case .rightHalf:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.width = fraction.of(screen.width)
         rect.x = screen.x + screen.width - rect.width
         return rect
       }
     case .topHalf:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.height = fraction.of(screen.height)
         rect.y = screen.y + screen.height - rect.height
         return rect
       }
     case .bottomHalf:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.height = fraction.of(screen.height)
         return rect
       }
     case .upperLeft:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.width = fraction.of(screen.width)
         rect.height = (screen.height / 2).floored
@@ -57,7 +62,7 @@ public enum WindowLayout {
         return rect
       }
     case .upperRight:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.width = fraction.of(screen.width)
         rect.x = screen.x + screen.width - rect.width
@@ -66,14 +71,14 @@ public enum WindowLayout {
         return rect
       }
     case .lowerLeft:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.width = fraction.of(screen.width)
         rect.height = (screen.height / 2).floored
         return rect
       }
     case .lowerRight:
-      return nextInResizeCycle(window) { fraction in
+      return place(fraction) { fraction in
         var rect = screen
         rect.width = fraction.of(screen.width)
         rect.x = screen.x + screen.width - rect.width
@@ -105,33 +110,10 @@ public enum WindowLayout {
 
   // MARK: - Halves and corners
 
-  /// A size in the resize cycle, as a fraction of the screen's width or height.
-  struct Fraction: Equatable {
-    var numerator: Double
-    var denominator: Double
-
-    func of(_ length: Double) -> Double {
-      (length * numerator / denominator).floored
-    }
-  }
-
-  /// The sizes that repeated presses of a half or corner shortcut step through. The first press
-  /// lands on 1/2, and each further press moves to the next size, wrapping around.
-  static let resizeCycle: [Fraction] = [
-    Fraction(numerator: 1, denominator: 2),
-    Fraction(numerator: 2, denominator: 3),
-    Fraction(numerator: 3, denominator: 4),
-    Fraction(numerator: 1, denominator: 4),
-    Fraction(numerator: 1, denominator: 3),
-  ]
-
-  /// The rect for the size after the one `window` occupies now, or for 1/2 if it occupies none.
-  /// `rectForFraction` places a rect of the given size for the action.
-  static func nextInResizeCycle(_ window: Rect, rectForFraction: (Fraction) -> Rect) -> Rect {
-    for (index, fraction) in resizeCycle.enumerated() where rectForFraction(fraction).isCentered(on: window) {
-      return rectForFraction(resizeCycle[(index + 1) % resizeCycle.count])
-    }
-    return rectForFraction(resizeCycle[0])
+  /// Builds the rect for `fraction` with `rectForFraction`. A seam for readability: each half and
+  /// corner case above only says how to place a rect of a given size.
+  static func place(_ fraction: Fraction, rectForFraction: (Fraction) -> Rect) -> Rect {
+    rectForFraction(fraction)
   }
 
   // MARK: - Thirds

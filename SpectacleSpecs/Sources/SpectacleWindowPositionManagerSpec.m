@@ -73,6 +73,8 @@
                                        visibleFrameOfSourceScreen:(CGRect)visibleFrameOfSourceScreen
                                   visibleFrameOfDestinationScreen:(CGRect)visibleFrameOfDestinationScreen
                                                            action:(SpectacleWindowAction *)action
+                                                fractionNumerator:(double)fractionNumerator
+                                              fractionDenominator:(double)fractionDenominator
 {
   _calculationCount++;
   return [SpectacleWindowPositionCalculationResult resultWithAction:action

@@ -24,8 +24,11 @@ Including screenshots or videos are extremely helpful so please include them if 
 2. Add tests if your changes can and should be tested (tests use plain XCTest; see `SpectacleSpecs/`)
 3. Run the test suite and confirm that all tests pass:
    `xcodebuild -project Spectacle.xcodeproj -scheme Spectacle -destination 'platform=macOS' test`
+   - The window position math lives in JavaScript (`Spectacle/Resources/Window Position Calculations/`). You can test it on any OS, without Xcode, with Node 18 or later:
+     `node --test Tests/geometry/geometry.test.mjs`
+     This runs every case from the XCTest `*CalculationSpec.m` files plus a few invariants (windows stay on screen, sizes cycle correctly). Add new cases to the XCTest spec and they run in both suites.
 4. Rebase your changes on top of the most recent changes from `master`
-5. Make sure the GitHub Actions CI build passes on your pull request
+5. Make sure the GitHub Actions CI build passes on your pull request. Each CI run also uploads an unsigned build of the app (under the run's **Artifacts**) that you can try on a Mac.
 
 ## Coding Style
 

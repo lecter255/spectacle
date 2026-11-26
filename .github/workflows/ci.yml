@@ -14,6 +14,20 @@ permissions:
   contents: read
 
 jobs:
+  geometry:
+    # Fast check of the window position math (the bundled JavaScript) on Linux. Runs every case from
+    # the XCTest calculation specs plus extra invariants in a few seconds; see Tests/geometry/.
+    name: Window geometry tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run geometry tests
+        run: node --test Tests/geometry/geometry.test.mjs
+
   build-and-test:
     name: Build and test
     runs-on: macos-15
@@ -48,9 +62,25 @@ jobs:
             -scheme Spectacle \
             -configuration Release \
             -destination 'platform=macOS' \
+            -derivedDataPath build \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
             build
+
+      - name: Package Release build
+        run: |
+          app="build/Build/Products/Release/Spectacle.app"
+          test -d "$app"
+          ditto -c -k --keepParent "$app" Spectacle.zip
+
+      # An unsigned, un-notarized test build for trying changes on a real Mac. Not a release: macOS
+      # will refuse to open it until you right-click it and choose Open (or clear the quarantine flag).
+      - name: Upload Release build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Spectacle-unsigned-${{ github.sha }}
+          path: Spectacle.zip
+          retention-days: 14
 
       - name: Upload test results
         if: failure()

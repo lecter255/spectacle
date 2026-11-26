@@ -74,6 +74,7 @@ public final class SpectacleResizeSessionMonitor: NSObject {
       endSession()
       return SpectacleResizeLayout(action: actionName, fraction: .oneHalf)
     }
+    tracker.sizes = StoredResizeSizes.current
     let layout = tracker.layout(for: action, heldModifiers: heldModifiers())
     updatePolling()
     return SpectacleResizeLayout(action: layout.action.rawValue, fraction: layout.fraction)
@@ -105,6 +106,20 @@ public final class SpectacleResizeSessionMonitor: NSObject {
       // Keep polling while a menu is being tracked, too.
       RunLoop.main.add(timer, forMode: .common)
       pollTimer = timer
+    }
+  }
+}
+
+/// The resize-session sizes chosen in the settings window, read from user defaults.
+enum StoredResizeSizes {
+  static var current: [Fraction] {
+    get {
+      ResizeSizePreference.sizes(
+        fromStored: UserDefaults.standard.stringArray(forKey: ResizeSizePreference.defaultsKey))
+    }
+    set {
+      UserDefaults.standard.set(
+        ResizeSizePreference.storedValue(for: newValue), forKey: ResizeSizePreference.defaultsKey)
     }
   }
 }

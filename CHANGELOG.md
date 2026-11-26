@@ -8,6 +8,9 @@ specific to this fork.
 
 ### Interface
 
+- Choose which sizes a held-key resize steps through: the settings inspector for any half or
+  corner has "Press again for" toggles for ¼, ⅓, ⅔ and ¾ (½ is always on). The snap HUD shows only
+  the chosen sizes.
 - A new settings window replaces the old preferences window. The Layouts tab shows every shortcut
   as a card, grouped into halves, corners, center/fill/size, thirds, displays and history; selecting
   one opens an inspector with its shortcut recorder and, for halves and corners, the sizes it steps

@@ -5,9 +5,10 @@
 /// towards its anchored edge (shrink), and pressing the mirror shortcut moves it away (grow). For
 /// a left half, that means ← shrinks and → grows; for a top half, ↑ shrinks and ↓ grows. Corners
 /// work the same way on their width, so upper left grows with upper right, and their height stays
-/// at 1/2. Sizes step through 1/4, 1/3, 1/2, 2/3 and 3/4 and stop at either end.
+/// at 1/2. Sizes step through 1/4, 1/3, 1/2, 2/3 and 3/4 and stop at either end; people can turn
+/// off any of them except 1/2 (see `ResizeSizePreference`).
 public struct ResizeSession: Equatable {
-  /// The sizes a session steps through, smallest first.
+  /// Every size a session can step through, smallest first. The default set.
   public static let sizes: [Fraction] = [
     Fraction(numerator: 1, denominator: 4),
     Fraction(numerator: 1, denominator: 3),
@@ -16,8 +17,6 @@ public struct ResizeSession: Equatable {
     Fraction(numerator: 3, denominator: 4),
   ]
 
-  /// The index of 1/2 in `sizes`, where every session starts.
-  public static let startIndex = 2
 
   /// What a press does to the window during a session.
   public enum Step: Equatable {
@@ -27,19 +26,24 @@ public struct ResizeSession: Equatable {
 
   /// The half or corner the session started with. Its anchored edge stays put.
   public let action: WindowAction
+  /// The sizes this session steps through, smallest first. Always includes 1/2.
+  public let sizes: [Fraction]
   /// The index in `sizes` of the window's current size.
   public private(set) var sizeIndex: Int
 
   /// The window's current size.
-  public var fraction: Fraction { Self.sizes[sizeIndex] }
+  public var fraction: Fraction { sizes[sizeIndex] }
 
-  /// Starts a session at 1/2, or returns nil if `action` isn't a half or corner.
-  public init?(action: WindowAction) {
+  /// Starts a session at 1/2, or returns nil if `action` isn't a half or corner. `sizes` is
+  /// cleaned up with `ResizeSizePreference.normalized`, so it is sorted and contains 1/2.
+  public init?(action: WindowAction, sizes: [Fraction] = ResizeSession.sizes) {
     guard action.resizeMirror != nil else {
       return nil
     }
+    let sizes = ResizeSizePreference.normalized(sizes)
     self.action = action
-    self.sizeIndex = Self.startIndex
+    self.sizes = sizes
+    self.sizeIndex = sizes.firstIndex(of: .oneHalf) ?? 0
   }
 
   /// What pressing `incoming` does during a session that started with `anchor`, or nil if
@@ -62,7 +66,7 @@ public struct ResizeSession: Equatable {
     }
     switch step {
     case .grow:
-      sizeIndex = min(sizeIndex + 1, Self.sizes.count - 1)
+      sizeIndex = min(sizeIndex + 1, sizes.count - 1)
     case .shrink:
       sizeIndex = max(sizeIndex - 1, 0)
     }
@@ -83,6 +87,8 @@ public struct ResizeSessionTracker: Equatable {
   }
 
   public private(set) var session: ResizeSession?
+  /// The sizes new sessions step through. A running session keeps the sizes it started with.
+  public var sizes: [Fraction] = ResizeSession.sizes
   /// The modifiers held when the session started.
   public private(set) var sessionModifiers: UInt64 = 0
 
@@ -98,7 +104,7 @@ public struct ResizeSessionTracker: Equatable {
     session = nil
     // A press with no modifiers held (from the menu, say) can't be followed by a held-key
     // adjustment, so it doesn't start a session.
-    if heldModifiers != 0, let started = ResizeSession(action: action) {
+    if heldModifiers != 0, let started = ResizeSession(action: action, sizes: sizes) {
       session = started
       sessionModifiers = heldModifiers
       return Layout(action: action, fraction: started.fraction)
@@ -134,5 +140,37 @@ extension WindowAction {
     case .lowerRight: return .lowerLeft
     default: return nil
     }
+  }
+}
+
+/// Which of `ResizeSession.sizes` people want a session to step through, stored in user defaults
+/// as strings like "1/4".
+public enum ResizeSizePreference {
+  public static let defaultsKey = "SpectacleResizeSizes"
+
+  /// Sorts `sizes`, drops duplicates and anything not in `ResizeSession.sizes`, and adds 1/2,
+  /// where every session starts.
+  public static func normalized(_ sizes: [Fraction]) -> [Fraction] {
+    ResizeSession.sizes.filter { $0 == .oneHalf || sizes.contains($0) }
+  }
+
+  /// The sizes from a stored value, or every size when nothing is stored.
+  public static func sizes(fromStored stored: [String]?) -> [Fraction] {
+    guard let stored = stored else {
+      return ResizeSession.sizes
+    }
+    return normalized(ResizeSession.sizes.filter { stored.contains($0.storedValue) })
+  }
+
+  /// The value to store for `sizes`.
+  public static func storedValue(for sizes: [Fraction]) -> [String] {
+    normalized(sizes).map(\.storedValue)
+  }
+}
+
+extension Fraction {
+  /// "1/4" and so on: how a size is written in user defaults.
+  public var storedValue: String {
+    "\(Int(numerator))/\(Int(denominator))"
   }
 }

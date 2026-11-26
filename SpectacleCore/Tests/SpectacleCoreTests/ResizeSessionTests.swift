@@ -107,3 +107,47 @@ final class ResizeSessionTests: XCTestCase {
     }
   }
 }
+
+final class ResizeSizePreferenceTests: XCTestCase {
+  let quarter = Fraction(numerator: 1, denominator: 4)
+  let third = Fraction(numerator: 1, denominator: 3)
+  let twoThirds = Fraction(numerator: 2, denominator: 3)
+  let threeQuarters = Fraction(numerator: 3, denominator: 4)
+
+  func testNothingStoredMeansEverySize() {
+    XCTAssertEqual(ResizeSizePreference.sizes(fromStored: nil), ResizeSession.sizes)
+  }
+
+  func testStoredSizesAlwaysKeepAHalfAndIgnoreJunk() {
+    XCTAssertEqual(
+      ResizeSizePreference.sizes(fromStored: ["3/4", "bogus", "1/3"]), [third, .oneHalf, threeQuarters])
+    XCTAssertEqual(ResizeSizePreference.sizes(fromStored: []), [.oneHalf])
+  }
+
+  func testStoredValueRoundTrips() {
+    let stored = ResizeSizePreference.storedValue(for: [threeQuarters, quarter])
+    XCTAssertEqual(stored, ["1/4", "1/2", "3/4"])
+    XCTAssertEqual(ResizeSizePreference.sizes(fromStored: stored), [quarter, .oneHalf, threeQuarters])
+  }
+
+  func testSessionStepsOnlyThroughChosenSizes() {
+    var tracker = ResizeSessionTracker()
+    tracker.sizes = [.oneHalf, twoThirds]
+    let held: UInt64 = 1 << 20
+    XCTAssertEqual(tracker.layout(for: .leftHalf, heldModifiers: held).fraction, .oneHalf)
+    // Shrinking stops at 1/2, the smallest chosen size.
+    XCTAssertEqual(tracker.layout(for: .leftHalf, heldModifiers: held).fraction, .oneHalf)
+    XCTAssertEqual(tracker.layout(for: .rightHalf, heldModifiers: held).fraction, twoThirds)
+    XCTAssertEqual(tracker.layout(for: .rightHalf, heldModifiers: held).fraction, twoThirds)
+  }
+
+  func testFeedbackUsesChosenSizes() {
+    let feedback = SnapFeedback.make(
+      action: .leftHalf, fraction: .oneHalf, sessionActive: true,
+      window: Rect(x: 0, y: 0, width: 500, height: 800), screen: Rect(x: 0, y: 0, width: 1000, height: 800),
+      sizes: [.oneHalf, twoThirds])
+    XCTAssertEqual(feedback.steps, ["½", "⅔"])
+    XCTAssertEqual(feedback.currentStep, 0)
+    XCTAssertEqual(feedback.hint, "Opposite for ⅔")
+  }
+}

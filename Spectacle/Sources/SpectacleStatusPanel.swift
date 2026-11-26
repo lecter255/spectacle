@@ -39,7 +39,8 @@ public final class SpectacleStatusPanel: NSObject {
   }
 
   /// Shows the panel below `button`, or hides it if it is already showing.
-  @objc public func toggle(relativeTo button: NSStatusBarButton) {
+  @objc(toggleRelativeToButton:)
+  public func toggle(relativeTo button: NSStatusBarButton) {
     if isShown {
       close()
     } else {

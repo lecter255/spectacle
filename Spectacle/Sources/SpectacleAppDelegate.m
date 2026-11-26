@@ -399,7 +399,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
     [_statusPanel close];
     [self statusPanelShowFullMenu];
   } else {
-    [_statusPanel toggleRelativeTo:_statusItem.button];
+    [_statusPanel toggleRelativeToButton:_statusItem.button];
   }
 }
 

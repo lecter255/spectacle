@@ -36,6 +36,8 @@ specific to this fork.
   package ported from the bundled JavaScript and tested against every case in the existing specs.
   It has no macOS dependencies, so it is also built and tested on Linux in CI. The app uses it in
   place of the JavaScript calculations, which (with JavaScriptCore) have been removed.
+- Screen selection (which display a window is on, and where Next/Previous Display sends it) moved
+  into `SpectacleCore` too, with its first unit tests.
 - The minimum macOS version is now 11 (Big Sur), up from 10.13, so the app can use the Swift
   runtime built into macOS and, later, SwiftUI.
 

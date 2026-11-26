@@ -66,6 +66,11 @@
                                                                    [_javaScriptEnvironment valueWithRect:visibleFrameOfSourceScreen],
                                                                    [_javaScriptEnvironment valueWithRect:visibleFrameOfDestinationScreen],
                                                                    ]];
+  // If the script threw (the context's exception handler has already reported it) or returned
+  // something other than a rect, fail the action instead of moving the window to CGRectZero.
+  if (!result || !result.isObject) {
+    return nil;
+  }
   return [SpectacleWindowPositionCalculationResult resultWithAction:action windowRect:[result toRect]];
 }
 

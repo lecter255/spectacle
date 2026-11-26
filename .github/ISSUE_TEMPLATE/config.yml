@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Original Spectacle project (archived)
+    url: https://github.com/eczarny/spectacle
+    about: The original project is no longer maintained. Please report issues with this fork here, not there.

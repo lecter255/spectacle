@@ -96,15 +96,28 @@
     } else if (CGPointEqualToPoint(screenTwo.frame.origin, CGPointMake(0, 0))) {
       return NSOrderedDescending;
     }
-    return (NSComparisonResult)(screenTwo.frame.origin.y - screenOne.frame.origin.y);
+    return SpectacleCompareCoordinates(screenTwo.frame.origin.y, screenOne.frame.origin.y);
   }] sortedArrayWithOptions:NSSortStable usingComparator:^(NSScreen *screenOne, NSScreen *screenTwo) {
     if (CGPointEqualToPoint(screenOne.frame.origin, CGPointMake(0, 0))) {
       return NSOrderedAscending;
     } else if (CGPointEqualToPoint(screenTwo.frame.origin, CGPointMake(0, 0))) {
       return NSOrderedDescending;
     }
-    return (NSComparisonResult)(screenTwo.frame.origin.x - screenOne.frame.origin.x);
+    return SpectacleCompareCoordinates(screenTwo.frame.origin.x, screenOne.frame.origin.x);
   }];
+}
+
+// Sort comparators must return exactly NSOrderedAscending, NSOrderedSame or NSOrderedDescending.
+// Casting a raw coordinate difference (e.g. 1440.0) to NSComparisonResult doesn't, and also
+// truncates sub-pixel differences to "same", which made the display order unreliable.
+static NSComparisonResult SpectacleCompareCoordinates(CGFloat a, CGFloat b)
+{
+  if (a < b) {
+    return NSOrderedAscending;
+  } else if (a > b) {
+    return NSOrderedDescending;
+  }
+  return NSOrderedSame;
 }
 
 static CGFloat computeAreaOfRect(CGRect rect)

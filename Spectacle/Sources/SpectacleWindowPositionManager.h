@@ -37,6 +37,13 @@ SPECTACLE_INIT_AND_NEW_UNAVAILABLE
 - (void)moveFrontmostWindowElement:(SpectacleAccessibilityElement *)frontmostWindowElement
                             action:(SpectacleWindowAction *)action;
 
+// Lays out a half or corner at a given size, outside any resize session (the menu bar panel's
+// size chips).
+- (void)moveFrontmostWindowElement:(SpectacleAccessibilityElement *)frontmostWindowElement
+                            action:(SpectacleWindowAction *)action
+                 fractionNumerator:(double)fractionNumerator
+               fractionDenominator:(double)fractionDenominator;
+
 - (void)undoLastWindowAction;
 - (void)redoLastWindowAction;
 

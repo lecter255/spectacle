@@ -16,6 +16,11 @@ public final class SpectacleResizeLayout: NSObject {
     self.fractionDenominator = fraction.denominator
     super.init()
   }
+
+  /// A layout at a size picked directly, such as from the menu bar panel's size chips.
+  @objc public convenience init(action: String, fractionNumerator: Double, fractionDenominator: Double) {
+    self.init(action: action, fraction: Fraction(numerator: fractionNumerator, denominator: fractionDenominator))
+  }
 }
 
 /// Connects SpectacleCore's `ResizeSessionTracker` to the keyboard: it reads which modifier keys are

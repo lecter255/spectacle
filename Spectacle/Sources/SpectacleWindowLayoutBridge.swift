@@ -63,7 +63,8 @@ public final class SpectacleScreenSelectionBridge: NSObject {
   }
 }
 
-private extension Rect {
+/// Converts AppKit and CoreGraphics rects for SpectacleCore. Shared by every Swift file in the app.
+extension Rect {
   init(_ rect: CGRect) {
     self.init(
       x: Double(rect.origin.x),

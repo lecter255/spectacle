@@ -61,6 +61,36 @@
                            screens:(NSArray<NSScreen *> *)screens
                         mainScreen:(NSScreen *)mainScreen
 {
+  [self moveFrontmostWindowElement:frontmostWindowElement
+                            action:action
+                           screens:screens
+                        mainScreen:mainScreen
+                            layout:nil];
+}
+
+- (void)moveFrontmostWindowElement:(SpectacleAccessibilityElement *)frontmostWindowElement
+                            action:(SpectacleWindowAction *)action
+                 fractionNumerator:(double)fractionNumerator
+               fractionDenominator:(double)fractionDenominator
+{
+  [_resizeSessionMonitor endSession];
+  SpectacleResizeLayout *layout = [[SpectacleResizeLayout alloc] initWithAction:action
+                                                              fractionNumerator:fractionNumerator
+                                                            fractionDenominator:fractionDenominator];
+  [self moveFrontmostWindowElement:frontmostWindowElement
+                            action:action
+                           screens:[NSScreen screens]
+                        mainScreen:[NSScreen mainScreen]
+                            layout:layout];
+}
+
+// A nil layout asks the resize session monitor, so a held-modifier press can grow or shrink.
+- (void)moveFrontmostWindowElement:(SpectacleAccessibilityElement *)frontmostWindowElement
+                            action:(SpectacleWindowAction *)action
+                           screens:(NSArray<NSScreen *> *)screens
+                        mainScreen:(NSScreen *)mainScreen
+                            layout:(SpectacleResizeLayout *)layout
+{
   SpectacleScreenDetectionResult *screenDetectionResult = [_screenDetector screenWithAction:action
                                                                      frontmostWindowElement:frontmostWindowElement
                                                                                     screens:screens
@@ -97,7 +127,9 @@
   previousFrontmostWindowRect = frontmostWindowRect;
   // During a resize session a half or corner press grows or shrinks the session's half instead of
   // moving the window, so the layout's action can differ from the one pressed.
-  SpectacleResizeLayout *layout = [_resizeSessionMonitor layoutForAction:action];
+  if (!layout) {
+    layout = [_resizeSessionMonitor layoutForAction:action];
+  }
   windowPositionCalculationResult = [_windowPositionCalculator calculateWindowRect:frontmostWindowRect
                                                         visibleFrameOfSourceScreen:visibleFrameOfSourceScreen
                                                    visibleFrameOfDestinationScreen:visibleFrameOfDestinationScreen

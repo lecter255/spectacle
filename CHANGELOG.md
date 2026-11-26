@@ -14,6 +14,9 @@ specific to this fork.
 
 ### Interface
 
+- A first-run tour: it asks for Accessibility access (and moves on by itself once it's granted),
+  then has you try a half, a corner and Fill Screen on the tour's own window, with the real
+  shortcut shown as keycaps. Replay it from Settings > General > Show Welcome Tour.
 - Choose which sizes a held-key resize steps through: the settings inspector for any half or
   corner has "Press again for" toggles for ¼, ⅓, ⅔ and ¾ (½ is always on). The snap HUD shows only
   the chosen sizes.

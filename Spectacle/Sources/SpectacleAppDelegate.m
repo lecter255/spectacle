@@ -22,12 +22,13 @@ static BOOL SpectacleIsRunningUnitTests(void)
     || NSClassFromString(@"XCTestCase") != Nil;
 }
 
-@interface SpectacleAppDelegate () <SpectacleStatusPanelDelegate>
+@interface SpectacleAppDelegate () <SpectacleStatusPanelDelegate, SpectacleOnboardingDelegate>
 @end
 
 @implementation SpectacleAppDelegate
 {
   SpectacleStatusPanel *_statusPanel;
+  SpectacleOnboardingWindowController *_onboardingWindowController;
   NSDictionary<NSString *, NSMenuItem *> *_shortcutMenuItems;
   NSStatusItem *_statusItem;
   id<SpectacleShortcutStorage> _shortcutStorage;
@@ -141,7 +142,74 @@ static BOOL SpectacleIsRunningUnitTests(void)
     [self enableStatusItem];
   }
   [self updateShortcutMenuItems];
-  [self showAccessibilityAccessDialogIfNeeded];
+  [notificationCenter addObserver:self
+                         selector:@selector(showOnboarding)
+                             name:SpectacleOnboardingWindowController.showNotificationName
+                           object:nil];
+  // The first-run tour asks for Accessibility access itself; after that, the plain dialog does.
+  if (SpectacleOnboardingWindowController.isCompleted) {
+    [self showAccessibilityAccessDialogIfNeeded];
+  } else {
+    [self showOnboarding];
+  }
+}
+
+- (void)showOnboarding
+{
+  if (!_onboardingWindowController) {
+    _onboardingWindowController = [SpectacleOnboardingWindowController new];
+    _onboardingWindowController.delegate = self;
+  }
+  [_onboardingWindowController show];
+}
+
+#pragma mark - SpectacleOnboardingDelegate
+
+- (NSString *)onboardingShortcutDisplayStringForShortcutName:(NSString *)shortcutName
+{
+  SpectacleShortcut *shortcut = [_shortcutManager shortcutForShortcutName:shortcutName];
+  if (!shortcut || shortcut.isClearedShortcut) {
+    return nil;
+  }
+  return shortcut.displayString;
+}
+
+- (NSString *)onboardingShortcutNameMatchingEvent:(NSEvent *)event
+{
+  NSEventModifierFlags relevantModifiers = NSEventModifierFlagCommand | NSEventModifierFlagOption
+    | NSEventModifierFlagControl | NSEventModifierFlagShift;
+  NSUInteger eventModifiers = event.modifierFlags & relevantModifiers;
+  for (SpectacleShortcut *shortcut in _shortcutManager.shortcuts) {
+    if (shortcut.isClearedShortcut || shortcut.shortcutKeyCode != event.keyCode) {
+      continue;
+    }
+    NSUInteger shortcutModifiers = SpectacleConvertModifiersToCocoaIfNecessary(shortcut.shortcutModifiers) & relevantModifiers;
+    if (shortcutModifiers == eventModifiers) {
+      return shortcut.shortcutName;
+    }
+  }
+  return nil;
+}
+
+- (void)onboardingPerformShortcutNamed:(NSString *)shortcutName
+{
+  SpectacleShortcut *shortcut = [_shortcutManager shortcutForShortcutName:shortcutName];
+  if (!shortcut) {
+    return;
+  }
+  [_windowPositionManager moveFrontmostWindowElement:[SpectacleAccessibilityElement frontmostWindowElement]
+                                              action:shortcut.windowAction];
+}
+
+- (void)onboardingOpenAccessibilitySettings
+{
+  [self openSystemPreferences:self];
+}
+
+- (void)onboardingShowSettings
+{
+  [NSApp activateIgnoringOtherApps:YES];
+  [self showPreferencesWindow:self];
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)application hasVisibleWindows:(BOOL)visibleWindows

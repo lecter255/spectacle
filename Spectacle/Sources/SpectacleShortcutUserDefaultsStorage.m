@@ -23,7 +23,7 @@
 {
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   for (SpectacleShortcut *shortcut in shortcuts) {
-    NSData *shortcutData = [NSKeyedArchiver archivedDataWithRootObject:shortcut];
+    NSData *shortcutData = SpectacleArchiveShortcut(shortcut);
     NSString *shortcutName = shortcut.shortcutName;
     if (![shortcutData isEqualToData:[userDefaults dataForKey:shortcutName]]) {
       [userDefaults setObject:shortcutData forKey:shortcutName];
@@ -65,10 +65,37 @@
 {
   NSMutableArray<SpectacleShortcut *> *shortcuts = [NSMutableArray new];
   for (NSData *shortcutData in dictionary.allValues) {
-    SpectacleShortcut *shortcut = [NSKeyedUnarchiver unarchiveObjectWithData:shortcutData];
-    [shortcuts addObject:[shortcut copyWithShortcutAction:action]];
+    SpectacleShortcut *shortcut = SpectacleUnarchiveShortcut(shortcutData);
+    if (shortcut) {
+      [shortcuts addObject:[shortcut copyWithShortcutAction:action]];
+    }
   }
   return shortcuts;
+}
+
+// These read and write the legacy keyed-archive format, which predates secure coding. Secure coding
+// stays off so shortcuts saved by older versions (including under the SpectacleHotKey, ZeroKitHotKey
+// and ZKHotKey class names mapped in +initialize) can still be read and migrated.
+static NSData *SpectacleArchiveShortcut(SpectacleShortcut *shortcut)
+{
+  NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:NO];
+  [archiver encodeObject:shortcut forKey:NSKeyedArchiveRootObjectKey];
+  [archiver finishEncoding];
+  return archiver.encodedData;
+}
+
+static SpectacleShortcut *SpectacleUnarchiveShortcut(NSData *data)
+{
+  NSError *error;
+  NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:data error:&error];
+  if (!unarchiver) {
+    NSLog(@"Spectacle: unable to read a stored shortcut: %@", error.localizedDescription);
+    return nil;
+  }
+  unarchiver.requiresSecureCoding = NO;
+  id shortcut = [unarchiver decodeObjectForKey:NSKeyedArchiveRootObjectKey];
+  [unarchiver finishDecoding];
+  return [shortcut isKindOfClass:[SpectacleShortcut class]] ? shortcut : nil;
 }
 
 @end

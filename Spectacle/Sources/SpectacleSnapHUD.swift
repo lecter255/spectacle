@@ -61,7 +61,8 @@ public final class SpectacleSnapHUD: NSObject {
       fraction: Fraction(numerator: fractionNumerator, denominator: fractionDenominator),
       sessionActive: sessionActive,
       window: Rect(windowRect),
-      screen: Rect(visibleFrame)
+      screen: Rect(visibleFrame),
+      sizes: StoredResizeSizes.current
     )
     present(feedback, on: visibleFrame)
     scheduleHide(after: sessionActive ? Self.sessionVisibleDuration : Self.visibleDuration)

@@ -42,18 +42,20 @@ public struct SnapFeedback: Equatable {
   ///   - sessionActive: Whether a resize session is running, so pressing again resizes.
   ///   - window: The window's new frame, in the same bottom-left-origin space as `screen`.
   ///   - screen: The visible frame of the screen the window is on.
+  ///   - sizes: The sizes a resize session steps through, for the steps and the hint.
   public static func make(
     action: WindowAction,
     fraction: Fraction,
     sessionActive: Bool,
     window: Rect,
-    screen: Rect
+    screen: Rect,
+    sizes: [Fraction] = ResizeSession.sizes
   ) -> SnapFeedback {
     let region = Self.region(of: window, in: screen)
     guard action.resizeMirror != nil else {
       return SnapFeedback(title: action.title, region: region)
     }
-    let sizes = ResizeSession.sizes
+    let sizes = ResizeSizePreference.normalized(sizes)
     let index = sizes.firstIndex(of: fraction)
     var hint: String?
     if sessionActive, let index = index {

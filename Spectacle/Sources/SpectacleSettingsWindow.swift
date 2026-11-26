@@ -93,6 +93,7 @@ final class SettingsModel: ObservableObject {
     isStatusItemEnabled = dataSource?.settingsIsStatusItemEnabled() ?? true
     appearance = SpectacleAppearance.shared.preference
     isSnapHUDEnabled = SpectacleSnapHUD.isEnabled
+    resizeSizes = StoredResizeSizes.current
   }
 
   var selectedEntry: ShortcutCatalog.Entry {
@@ -127,6 +128,19 @@ final class SettingsModel: ObservableObject {
   var snapHUDBinding: Binding<Bool> {
     Binding(get: { self.isSnapHUDEnabled }, set: { enabled in
       SpectacleSnapHUD.isEnabled = enabled
+      self.reload()
+    })
+  }
+
+  @Published private(set) var resizeSizes = StoredResizeSizes.current
+
+  func sizeBinding(_ fraction: Fraction) -> Binding<Bool> {
+    Binding(get: { self.resizeSizes.contains(fraction) }, set: { enabled in
+      var sizes = self.resizeSizes.filter { $0 != fraction }
+      if enabled {
+        sizes.append(fraction)
+      }
+      StoredResizeSizes.current = sizes
       self.reload()
     })
   }
@@ -289,21 +303,21 @@ struct ShortcutInspector: View {
       }
       if let action = entry.action, action.resizeMirror != nil {
         VStack(alignment: .leading, spacing: 6) {
-          Text("Sizes")
+          Text("Press again for")
             .font(.system(size: 11, weight: .semibold))
             .foregroundColor(.secondary)
-          HStack(spacing: 6) {
-            ForEach(ResizeSession.sizes, id: \.self) { fraction in
-              Text(fraction.glyph)
-                .font(.system(size: 13, weight: fraction == .oneHalf ? .bold : .regular))
-                .frame(width: 34, height: 24)
-                .background(
-                  RoundedRectangle(cornerRadius: 6)
-                    .fill(fraction == .oneHalf ? panelAccentWash : Color.primary.opacity(0.06))
-                )
+          ForEach(ResizeSession.sizes, id: \.self) { fraction in
+            Toggle(isOn: model.sizeBinding(fraction)) {
+              HStack(spacing: 8) {
+                Text(fraction.glyph)
+                  .font(.system(size: 13, weight: .semibold))
+                  .frame(width: 18)
+                Text(sizeName(fraction))
+              }
             }
+            .disabled(fraction == .oneHalf)
           }
-          Text("Starts at ½. Keep the keys held and press again to shrink, or press the opposite side to grow.")
+          Text("Halves and corners start at ½. Keep the keys held and press again to shrink, or press the opposite side to grow. Applies to every half and corner.")
             .font(.system(size: 11))
             .foregroundColor(.secondary)
             .fixedSize(horizontal: false, vertical: true)
@@ -312,6 +326,17 @@ struct ShortcutInspector: View {
       Spacer()
     }
     .padding(20)
+  }
+}
+
+private func sizeName(_ fraction: Fraction) -> String {
+  switch fraction.storedValue {
+  case "1/4": return "One quarter"
+  case "1/3": return "One third"
+  case "1/2": return "Half (always on)"
+  case "2/3": return "Two thirds"
+  case "3/4": return "Three quarters"
+  default: return fraction.storedValue
   }
 }
 

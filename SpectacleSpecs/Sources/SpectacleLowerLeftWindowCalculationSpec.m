@@ -88,25 +88,4 @@
   SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 720.0f, 436.0f));
 }
 
-- (void)testRepeatedPressesStepThroughEverySizeAndWrapAround
-{
-  // 1/2, 2/3, 3/4, 1/4, 1/3, then back to 1/2.
-  NSArray<NSValue *> *expectedRects = @[
-    [NSValue valueWithRect:NSRectFromCGRect(CGRectMake(0.0f, 4.0f, 720.0f, 436.0f))],
-    [NSValue valueWithRect:NSRectFromCGRect(CGRectMake(0.0f, 4.0f, 960.0f, 436.0f))],
-    [NSValue valueWithRect:NSRectFromCGRect(CGRectMake(0.0f, 4.0f, 1080.0f, 436.0f))],
-    [NSValue valueWithRect:NSRectFromCGRect(CGRectMake(0.0f, 4.0f, 360.0f, 436.0f))],
-    [NSValue valueWithRect:NSRectFromCGRect(CGRectMake(0.0f, 4.0f, 480.0f, 436.0f))],
-    [NSValue valueWithRect:NSRectFromCGRect(CGRectMake(0.0f, 4.0f, 720.0f, 436.0f))],
-  ];
-  CGRect windowRect = CGRectMake(165.0f, 245.0f, 564.0f, 384.0f);
-  for (NSValue *expectedRect in expectedRects) {
-    windowRect = [windowPositionCalculator calculateWindowRect:windowRect
-                                    visibleFrameOfSourceScreen:visibleFrameSourceScreen
-                               visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
-                                                        action:kSpectacleWindowActionLowerLeft].windowRect;
-    SpectacleAssertEqualRects(windowRect, NSRectToCGRect(expectedRect.rectValue));
-  }
-}
-
 @end

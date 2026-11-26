@@ -70,6 +70,8 @@
 		8ACFC11844C68C532C63539B /* WindowResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9840DBC5A2BCE7C21E5DDA01 /* WindowResizer.swift */; };
 		092855FF2A8965B0CBB456E0 /* SpectacleWindowLayoutBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68761428070F746922ED5830 /* SpectacleWindowLayoutBridge.swift */; };
 		9F29C5085EB93BAB51CEEA64 /* SpectacleResizeSessionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CCC013F69F1465BC3E5AE1 /* SpectacleResizeSessionMonitor.swift */; };
+		83C55128225C57C9A9C8FC4C /* SpectacleAccessibilityPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AE708730390AED29FF9956 /* SpectacleAccessibilityPermission.swift */; };
+		29D02FC9F7A38CD23B52FAD0 /* ScreenSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D035EF52BF983B531D7D867 /* ScreenSelection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -210,6 +212,8 @@
 		9840DBC5A2BCE7C21E5DDA01 /* WindowResizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WindowResizer.swift; path = SpectacleCore/Sources/SpectacleCore/WindowResizer.swift; sourceTree = "<group>"; };
 		68761428070F746922ED5830 /* SpectacleWindowLayoutBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleWindowLayoutBridge.swift; path = Spectacle/Sources/SpectacleWindowLayoutBridge.swift; sourceTree = "<group>"; };
 		36CCC013F69F1465BC3E5AE1 /* SpectacleResizeSessionMonitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleResizeSessionMonitor.swift; path = Spectacle/Sources/SpectacleResizeSessionMonitor.swift; sourceTree = "<group>"; };
+		02AE708730390AED29FF9956 /* SpectacleAccessibilityPermission.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleAccessibilityPermission.swift; path = Spectacle/Sources/SpectacleAccessibilityPermission.swift; sourceTree = "<group>"; };
+		1D035EF52BF983B531D7D867 /* ScreenSelection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScreenSelection.swift; path = SpectacleCore/Sources/SpectacleCore/ScreenSelection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -290,6 +294,7 @@
 				2DC8A0141B84E24500ABEBD5 /* Window Management */,
 				2D768E8B147ED51A00901E76 /* SpectacleAppDelegate.h */,
 				2D768E8C147ED51A00901E76 /* SpectacleAppDelegate.m */,
+				02AE708730390AED29FF9956 /* SpectacleAccessibilityPermission.swift */,
 				2DB075441CD041A5001CE204 /* SpectacleMacros.h */,
 				07BB542B1186662F0045663F /* SpectacleUtilities.h */,
 				07BB542C1186662F0045663F /* SpectacleUtilities.m */,
@@ -490,6 +495,7 @@
 		7C13004E0239AD8C5622A05C /* SpectacleCore */ = {
 			isa = PBXGroup;
 			children = (
+				1D035EF52BF983B531D7D867 /* ScreenSelection.swift */,
 				BE24BD1D5136E53BB76DFD08 /* Rect.swift */,
 				AED767729C9CE74265F67663 /* ResizeSession.swift */,
 				48DED59E451E734BEEC4291C /* WindowAction.swift */,
@@ -625,6 +631,7 @@
 				2D8DA05E147E113D003BE1D3 /* main.m in Sources */,
 				2D3A050D194956E100CD96E7 /* SpectacleAccessibilityElement.m in Sources */,
 				2D768E8D147ED51A00901E76 /* SpectacleAppDelegate.m in Sources */,
+				83C55128225C57C9A9C8FC4C /* SpectacleAccessibilityPermission.swift in Sources */,
 				2DAC59F31BB23BE200C660ED /* SpectacleBestEffortWindowMover.m in Sources */,
 				2D5A830F1CDC475B00EBE80A /* SpectacleDefaultShortcutHelpers.m in Sources */,
 				2D279ED416BB4A7800F6894A /* SpectacleHistory.m in Sources */,
@@ -653,6 +660,7 @@
 				2D8DA058147E113D003BE1D3 /* SpectacleWindowPositionManager.m in Sources */,
 				3023F8468B7644F5E33999EE /* Rect.swift in Sources */,
 				259C2400E54EF3B4EBBB1A2E /* ResizeSession.swift in Sources */,
+				29D02FC9F7A38CD23B52FAD0 /* ScreenSelection.swift in Sources */,
 				077D94FF2D73BE33C44824A2 /* WindowAction.swift in Sources */,
 				683B158C431F9BD4D9D5D86B /* WindowLayout.swift in Sources */,
 				8ACFC11844C68C532C63539B /* WindowResizer.swift in Sources */,

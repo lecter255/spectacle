@@ -39,6 +39,8 @@ specific to this fork.
   package ported from the bundled JavaScript and tested against every case in the existing specs.
   It has no macOS dependencies, so it is also built and tested on Linux in CI. The app uses it in
   place of the JavaScript calculations, which (with JavaScriptCore) have been removed.
+- Screen selection (which display a window is on, and where Next/Previous Display sends it) moved
+  into `SpectacleCore` too, with its first unit tests.
 - The minimum macOS version is now 11 (Big Sur), up from 10.13, so the app can use the Swift
   runtime built into macOS and, later, SwiftUI.
 
@@ -58,6 +60,9 @@ specific to this fork.
 - **Open System Settings** in the Accessibility prompt now opens Privacy & Security >
   Accessibility directly on every supported macOS version. The old bundled AppleScript drove a
   System Preferences pane that no longer exists and needed an extra Automation permission.
+- The Accessibility access dialog no longer blocks the app. It used to be app-modal, so the menu
+  bar item and preferences were unusable until you clicked a button, and it never noticed when
+  access was granted. It is now an ordinary window that closes itself once access is granted.
 - Fixed a crash when choosing "Disable for *application*" while an app without a bundle
   identifier was frontmost.
 - Fixed an inverted check in `SpectacleShortcutManager -updateShortcut:`. While shortcuts were

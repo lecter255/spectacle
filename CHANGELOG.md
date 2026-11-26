@@ -6,6 +6,13 @@ specific to this fork.
 
 ## Unreleased
 
+### Window management
+
+- Repeated presses of a half or corner shortcut now cycle through 1/2, 2/3, 3/4, 1/4 and 1/3
+  (previously 1/2, 2/3 and 1/3). The shared cycle lives in `SpectacleWindowCalculationHelpers.js`.
+- On screens with an odd pixel width, right-side half and corner positions are now flush with the
+  right edge instead of leaving a 1px gap.
+
 ### Build and tooling
 
 - Builds on current Xcode and macOS SDKs. The minimum deployment target is now macOS 10.13, the

@@ -43,7 +43,7 @@
   SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 436.0f));
 }
 
-- (void)testCalculateAWindowsCGRectInTheBottomTwoThirdsOfTheScreen
+- (void)testRepeatedPressesCycleFromHalfToTwoThirds
 {
   SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 436.0f)
                                                                         visibleFrameOfSourceScreen:visibleFrameSourceScreen
@@ -52,13 +52,40 @@
   SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 582.0f));
 }
 
-- (void)testCalculateAWindowsCGRectInTheBottomOneThirdOfTheScreen
+- (void)testRepeatedPressesCycleFromTwoThirdsToThreeQuarters
 {
   SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 582.0f)
                                                                         visibleFrameOfSourceScreen:visibleFrameSourceScreen
                                                                    visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
                                                                                             action:kSpectacleWindowActionBottomHalf];
+  SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 654.0f));
+}
+
+- (void)testRepeatedPressesCycleFromThreeQuartersToOneQuarter
+{
+  SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 654.0f)
+                                                                        visibleFrameOfSourceScreen:visibleFrameSourceScreen
+                                                                   visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
+                                                                                            action:kSpectacleWindowActionBottomHalf];
+  SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 218.0f));
+}
+
+- (void)testRepeatedPressesCycleFromOneQuarterToOneThird
+{
+  SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 218.0f)
+                                                                        visibleFrameOfSourceScreen:visibleFrameSourceScreen
+                                                                   visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
+                                                                                            action:kSpectacleWindowActionBottomHalf];
   SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 291.0f));
+}
+
+- (void)testRepeatedPressesCycleFromOneThirdBackToHalf
+{
+  SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 291.0f)
+                                                                        visibleFrameOfSourceScreen:visibleFrameSourceScreen
+                                                                   visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
+                                                                                            action:kSpectacleWindowActionBottomHalf];
+  SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 436.0f));
 }
 
 @end

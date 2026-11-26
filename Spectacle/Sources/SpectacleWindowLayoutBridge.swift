@@ -4,12 +4,15 @@ import Foundation
 /// Exposes SpectacleCore's `WindowLayout` to the Objective-C side of the app while the rest of it
 /// is ported to Swift. SpectacleCore itself stays free of CoreGraphics and Objective-C so it can be
 /// built and tested on any platform; the conversions live here.
+///
+/// It is `public` because, without a bridging header, only public declarations are written to the
+/// generated `Spectacle-Swift.h` that the Objective-C code imports.
 @objc(SpectacleWindowLayoutBridge)
-final class SpectacleWindowLayoutBridge: NSObject {
+public final class SpectacleWindowLayoutBridge: NSObject {
   /// The frame for the window after performing `actionName` (a `kSpectacleWindowAction…`
   /// constant), or `CGRect.null` if the action isn't a layout action (undo, redo, none).
   @objc(frameForAction:windowRect:visibleFrameOfSourceScreen:visibleFrameOfDestinationScreen:)
-  static func frame(
+  public static func frame(
     forAction actionName: String,
     windowRect: CGRect,
     visibleFrameOfSourceScreen: CGRect,

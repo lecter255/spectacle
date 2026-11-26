@@ -61,7 +61,7 @@ public final class SpectacleSettingsWindowController: NSObject {
 }
 
 /// The app's name in the new interface. One place to change when the app is renamed.
-let appDisplayName = "Spectacle"
+let appDisplayName = "Lens"
 
 final class SettingsModel: ObservableObject {
   enum Tab: Hashable {

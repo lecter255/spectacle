@@ -379,7 +379,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
   NSImage *statusImage = [NSBundle.mainBundle imageForResource:@"Spectacle Status Item"];
   [statusImage setTemplate:YES];
   _statusItem.button.image = statusImage;
-  _statusItem.button.toolTip = [@"Spectacle " stringByAppendingString:SpectacleUtilities.applicationVersion];
+  _statusItem.button.toolTip = [@"Lens " stringByAppendingString:SpectacleUtilities.applicationVersion];
   // A click opens the layout panel; a right-click or Control-click opens the full menu.
   _statusItem.button.target = self;
   _statusItem.button.action = @selector(statusItemClicked:);

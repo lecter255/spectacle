@@ -44,6 +44,7 @@ SPECTACLE_INIT_AND_NEW_UNAVAILABLE
 - (BOOL)isEqual:(id)object;
 - (BOOL)isEqualToShortcut:(SpectacleShortcut *)shortcut;
 
+/// Returns YES when the shortcut's modifiers are exactly `modifiers` (Cocoa or Carbon flags).
 - (BOOL)containsModifiers:(NSUInteger)modifiers;
 
 + (BOOL)validCocoaModifiers:(NSUInteger)modifiers;

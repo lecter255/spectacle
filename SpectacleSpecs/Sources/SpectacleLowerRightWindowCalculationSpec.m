@@ -1,24 +1,47 @@
-#import <Expecta/Expecta.h>
-#import <Specta/Specta.h>
+#import <XCTest/XCTest.h>
 
+#import "SpectacleTestHelpers.h"
 #import "SpectacleWindowPositionCalculationResult.h"
 #import "SpectacleWindowPositionCalculator.h"
 
-SpecBegin(SpectacleLowerRightWindowCalculation)
-describe(@"SpectacleLowerRightWindowCalculation", ^{
-  CGRect visibleFrameSourceScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
-  CGRect visibleFrameDestinationScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
-  SpectacleWindowPositionCalculator *windowPositionCalculator = [[SpectacleWindowPositionCalculator alloc] initWithErrorHandler:^(NSString *message) {
-    EXP_failure(message);
+@interface SpectacleLowerRightWindowCalculationTests : XCTestCase
+@end
+
+@implementation SpectacleLowerRightWindowCalculationTests
+{
+  CGRect visibleFrameSourceScreen;
+  CGRect visibleFrameDestinationScreen;
+  SpectacleWindowPositionCalculator *windowPositionCalculator;
+  NSMutableArray<NSString *> *calculationErrors;
+}
+
+- (void)setUp
+{
+  [super setUp];
+  visibleFrameSourceScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
+  visibleFrameDestinationScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
+  // Collect JavaScript errors instead of failing inside the block, which would need to capture self.
+  NSMutableArray<NSString *> *errors = [NSMutableArray new];
+  calculationErrors = errors;
+  windowPositionCalculator = [[SpectacleWindowPositionCalculator alloc] initWithErrorHandler:^(NSString *message) {
+    [errors addObject:message];
   }];
+}
 
-  it(@"should calculate a window's CGRect in the lower right corner of the screen", ^{
-    SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(165.0f, 245.0f, 564.0f, 384.0f)
-                                                                          visibleFrameOfSourceScreen:visibleFrameSourceScreen
-                                                                     visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
-                                                                                              action:kSpectacleWindowActionLowerRight];
+- (void)tearDown
+{
+  XCTAssertEqualObjects(calculationErrors, @[], @"The window position calculation raised a JavaScript error");
+  [super tearDown];
+}
 
-    expect(result.windowRect).to.equal(CGRectMake(720.0f, 4.0f, 720.0f, 436.0f));
-  });
-});
-SpecEnd
+- (void)testCalculateAWindowsCGRectInTheLowerRightCornerOfTheScreen
+{
+  SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(165.0f, 245.0f, 564.0f, 384.0f)
+                                                                        visibleFrameOfSourceScreen:visibleFrameSourceScreen
+                                                                   visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
+                                                                                            action:kSpectacleWindowActionLowerRight];
+
+  SpectacleAssertEqualRects(result.windowRect, CGRectMake(720.0f, 4.0f, 720.0f, 436.0f));
+}
+
+@end

@@ -1,9 +1,21 @@
 #import "SpectacleLoginItemHelper.h"
 
+@import ServiceManagement;
+
+// On macOS 13 and later, login items are managed through SMAppService. The LSSharedFileList
+// session login item API was deprecated in 10.11 and no longer works on current macOS releases,
+// so it is only used as a fallback on older systems.
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 @implementation SpectacleLoginItemHelper
 
 + (BOOL)isLoginItemEnabledForBundle:(NSBundle *)bundle
 {
+  if (@available(macOS 13.0, *)) {
+    return SMAppService.mainAppService.status == SMAppServiceStatusEnabled;
+  }
   LSSharedFileListRef sharedFileList = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
   NSString *applicationPath = bundle.bundlePath;
   BOOL result = NO;
@@ -32,6 +44,13 @@
 
 + (void)enableLoginItemForBundle:(NSBundle *)bundle
 {
+  if (@available(macOS 13.0, *)) {
+    NSError *error = nil;
+    if (![SMAppService.mainAppService registerAndReturnError:&error]) {
+      NSLog(@"Unable to register the login item: %@", error);
+    }
+    return;
+  }
   LSSharedFileListRef sharedFileList = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
   NSString *applicationPath = bundle.bundlePath;
   NSURL *applicationPathURL = [NSURL fileURLWithPath:applicationPath];
@@ -54,6 +73,13 @@
 
 + (void)disableLoginItemForBundle:(NSBundle *)bundle
 {
+  if (@available(macOS 13.0, *)) {
+    NSError *error = nil;
+    if (![SMAppService.mainAppService unregisterAndReturnError:&error]) {
+      NSLog(@"Unable to unregister the login item: %@", error);
+    }
+    return;
+  }
   LSSharedFileListRef sharedFileList = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
   NSString *applicationPath = bundle.bundlePath;
   if (sharedFileList) {
@@ -61,7 +87,7 @@
     NSArray *sharedFileListArray = CFBridgingRelease(LSSharedFileListCopySnapshot(sharedFileList, &seedValue));
     for (id sharedFile in sharedFileListArray) {
       LSSharedFileListItemRef sharedFileListItem = (__bridge LSSharedFileListItemRef)sharedFile;
-      CFURLRef applicationPathURL;
+      CFURLRef applicationPathURL = NULL;
       if (LSSharedFileListItemResolve(sharedFileListItem, 0, &applicationPathURL, NULL) == noErr) {
         NSString *resolvedApplicationPath = [(__bridge NSURL *)applicationPathURL path];
         if ([resolvedApplicationPath compare:applicationPath] == NSOrderedSame) {
@@ -77,3 +103,5 @@
 }
 
 @end
+
+#pragma clang diagnostic pop

@@ -38,7 +38,7 @@ static EventHotKeyID currentShortcutID = {
       NSLog(@"Unable to add shortcut %@ as it already exists.", shortcutName);
       continue;
     }
-    currentShortcutID.id = ++currentShortcutID.id;
+    currentShortcutID.id++;
     shortcutHolder = [[SpectacleShortcutHolder alloc] initWithShortcutID:currentShortcutID shortcut:shortcut];
     _registeredShortcutsByName[shortcutName] = _areShorcutsEnabled ? [self registerEventHotKey:shortcutHolder] : shortcutHolder;
   }
@@ -53,16 +53,18 @@ static EventHotKeyID currentShortcutID = {
     NSLog(@"Unable to update shortcut %@ as it does not exists.", shortcutName);
     return;
   }
-  if (_areShorcutsEnabled && [self unregisterEventHotKey:shortcutHolder]) {
+  // unregisterEventHotKey: returns YES on success. This check was previously inverted, so every
+  // update made while shortcuts were enabled bailed out early and the new binding never took effect.
+  if (_areShorcutsEnabled && ![self unregisterEventHotKey:shortcutHolder]) {
     NSLog(@"Unable to unregister event hot key for shortcut: %@", shortcutName);
     return;
   }
-  SpectacleShortcutHolder *registeredShortcutHolder = _areShorcutsEnabled ? [self registerEventHotKey:shortcutHolder] : shortcutHolder;
-  _registeredShortcutsByName[shortcutName] = [registeredShortcutHolder
-                                              copyWithShortcut:
-                                              [shortcut
-                                               copyWithShortcutAction:
-                                               shortcut.shortcutAction ?: shortcutHolder.shortcut.shortcutAction]];
+  // Build the holder for the *new* shortcut (dropping the stale hot key ref) before registering,
+  // otherwise the old key combination would be re-registered under the new shortcut.
+  SpectacleShortcut *updatedShortcut = [shortcut copyWithShortcutAction:
+                                        shortcut.shortcutAction ?: shortcutHolder.shortcut.shortcutAction];
+  SpectacleShortcutHolder *updatedShortcutHolder = [[shortcutHolder copyWithShortcutRef:NULL] copyWithShortcut:updatedShortcut];
+  _registeredShortcutsByName[shortcutName] = _areShorcutsEnabled ? [self registerEventHotKey:updatedShortcutHolder] : updatedShortcutHolder;
   [self storeShortcuts];
 }
 

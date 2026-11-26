@@ -587,6 +587,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		2DC25F9D19FF3F93009591A9 /* Update CFBundleVersion */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);

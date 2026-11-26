@@ -12,6 +12,7 @@
   CGRect visibleFrameSourceScreen;
   CGRect visibleFrameDestinationScreen;
   SpectacleWindowPositionCalculator *windowPositionCalculator;
+  NSMutableArray<NSString *> *calculationErrors;
 }
 
 - (void)setUp
@@ -19,11 +20,18 @@
   [super setUp];
   visibleFrameSourceScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
   visibleFrameDestinationScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
-  __weak __typeof__(self) weakSelf = self;
+  // Collect JavaScript errors instead of failing inside the block, which would need to capture self.
+  NSMutableArray<NSString *> *errors = [NSMutableArray new];
+  calculationErrors = errors;
   windowPositionCalculator = [[SpectacleWindowPositionCalculator alloc] initWithErrorHandler:^(NSString *message) {
-    __strong __typeof__(weakSelf) self = weakSelf;
-    XCTFail(@"%@", message);
+    [errors addObject:message];
   }];
+}
+
+- (void)tearDown
+{
+  XCTAssertEqualObjects(calculationErrors, @[], @"The window position calculation raised a JavaScript error");
+  [super tearDown];
 }
 
 - (void)testCalculateAWindowsSmallerCGRectWhenCenteredInTheScreen

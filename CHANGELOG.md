@@ -35,6 +35,11 @@ specific to this fork.
 - Removed an unused asset set that worked around a macOS 10.9 crash.
 - Added GitHub issue templates for bug reports and feature requests.
 
+- Started a gradual port to Swift. `SpectacleCore` is a new Swift package with the window layout
+  logic, ported from the bundled JavaScript and tested against every case in the existing specs.
+  It has no macOS dependencies, so it is built and tested on Linux in CI. The app doesn't use it
+  yet.
+
 ### Fork identity and security
 
 - New bundle identifier (`io.github.lecter255.Spectacle`) so the fork doesn't collide with the

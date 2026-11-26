@@ -22,3 +22,7 @@ DerivedData
 
 # Xcode test results
 *.xcresult
+
+# Swift Package Manager
+.build/
+.swiftpm/

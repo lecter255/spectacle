@@ -19,6 +19,9 @@
 + (SpectacleAccessibilityElement *)frontmostApplicationElement
 {
   NSRunningApplication *frontmostApplication = [NSWorkspace sharedWorkspace].frontmostApplication;
+  if (!frontmostApplication) {
+    return nil;
+  }
   SpectacleAccessibilityElement *frontmostApplicationElement = [SpectacleAccessibilityElement new];
   AXUIElementRef underlyingElement = AXUIElementCreateApplication(frontmostApplication.processIdentifier);
   frontmostApplicationElement.underlyingElement = underlyingElement;
@@ -44,9 +47,12 @@
 - (SpectacleAccessibilityElement *)elementWithAttribute:(CFStringRef)attribute
 {
   SpectacleAccessibilityElement *newElement = nil;
-  AXUIElementRef underlyingElement;
+  if (_underlyingElement == NULL) {
+    return nil;
+  }
+  AXUIElementRef underlyingElement = NULL;
   AXError result = AXUIElementCopyAttributeValue(_underlyingElement, attribute, (CFTypeRef *)&underlyingElement);
-  if (result == kAXErrorSuccess) {
+  if (result == kAXErrorSuccess && underlyingElement != NULL) {
     newElement = [SpectacleAccessibilityElement new];
     newElement.underlyingElement = underlyingElement;
     CFRelease(underlyingElement);
@@ -58,12 +64,15 @@
 
 - (NSString *)stringValueOfAttribute:(CFStringRef)attribute
 {
-  if (CFGetTypeID(_underlyingElement) == AXUIElementGetTypeID()) {
-    CFTypeRef value;
+  if (_underlyingElement != NULL && CFGetTypeID(_underlyingElement) == AXUIElementGetTypeID()) {
+    CFTypeRef value = NULL;
     AXError result;
     result = AXUIElementCopyAttributeValue(_underlyingElement, attribute, &value);
-    if (result == kAXErrorSuccess) {
-      return CFBridgingRelease(value);
+    if (result == kAXErrorSuccess && value != NULL) {
+      if (CFGetTypeID(value) == CFStringGetTypeID()) {
+        return CFBridgingRelease(value);
+      }
+      CFRelease(value);
     } else {
       NSLog(@"There was a problem getting the string value of the specified attribute: %@ (error code %d)", attribute, result);
     }
@@ -73,13 +82,19 @@
 
 - (AXValueRef)valueOfAttribute:(CFStringRef)attribute type:(AXValueType)type
 {
-  if (CFGetTypeID(_underlyingElement) == AXUIElementGetTypeID()) {
-    CFTypeRef value;
+  if (_underlyingElement != NULL && CFGetTypeID(_underlyingElement) == AXUIElementGetTypeID()) {
+    CFTypeRef value = NULL;
     AXError result;
-    result = AXUIElementCopyAttributeValue(_underlyingElement, attribute, (CFTypeRef *)&value);
-    if ((result == kAXErrorSuccess) && (AXValueGetType(value) == type)) {
-      return value;
+    result = AXUIElementCopyAttributeValue(_underlyingElement, attribute, &value);
+    if ((result == kAXErrorSuccess)
+        && (value != NULL)
+        && (CFGetTypeID(value) == AXValueGetTypeID())
+        && (AXValueGetType((AXValueRef)value) == type)) {
+      return (AXValueRef)value;
     } else {
+      if (value != NULL) {
+        CFRelease(value);
+      }
       NSLog(@"There was a problem getting the value of the specified attribute: %@ (error code %d)", attribute, result);
     }
   }
@@ -88,7 +103,7 @@
 
 - (void)setValue:(AXValueRef)value forAttribute:(CFStringRef)attribute
 {
-  AXError result = AXUIElementSetAttributeValue(_underlyingElement, attribute, (CFTypeRef *)value);
+  AXError result = AXUIElementSetAttributeValue(_underlyingElement, attribute, value);
   if (result != kAXErrorSuccess) {
     NSLog(@"There was a problem setting the value of the specified attribute: %@ (error code %d)", attribute, result);
   }
@@ -97,16 +112,23 @@
 - (CGRect)rectOfElement
 {
   CGRect result = CGRectNull;
-  CFTypeRef positionValue = [self valueOfAttribute:kAXPositionAttribute type:kAXValueCGPointType];
-  CFTypeRef sizeValue = [self valueOfAttribute:kAXSizeAttribute type:kAXValueCGSizeType];
+  AXValueRef positionValue = [self valueOfAttribute:kAXPositionAttribute type:kAXValueCGPointType];
+  AXValueRef sizeValue = [self valueOfAttribute:kAXSizeAttribute type:kAXValueCGSizeType];
   CGPoint position;
   CGSize size;
-  AXValueGetValue(positionValue, kAXValueCGPointType, (void *)&position);
-  AXValueGetValue(sizeValue, kAXValueCGSizeType, (void *)&size);
-  if ((positionValue != NULL) && (sizeValue != NULL)) {
-    CFRelease(positionValue);
-    CFRelease(sizeValue);
+  // Only read the values once both are known to be non-NULL; previously AXValueGetValue was
+  // called on a possibly-NULL value, and one value leaked when the other lookup failed.
+  if ((positionValue != NULL)
+      && (sizeValue != NULL)
+      && AXValueGetValue(positionValue, kAXValueCGPointType, (void *)&position)
+      && AXValueGetValue(sizeValue, kAXValueCGSizeType, (void *)&size)) {
     result = CGRectMake(position.x, position.y, size.width, size.height);
+  }
+  if (positionValue != NULL) {
+    CFRelease(positionValue);
+  }
+  if (sizeValue != NULL) {
+    CFRelease(sizeValue);
   }
   return result;
 }
@@ -126,7 +148,7 @@
 
 + (CGRect)normalizeCoordinatesOfRect:(CGRect)rect frameOfScreen:(CGRect)frameOfScreen
 {
-  CGRect frameOfScreenWithMenuBar = [[[NSScreen screens] objectAtIndex:0] frame];
+  CGRect frameOfScreenWithMenuBar = NSScreen.screens.firstObject.frame;
   rect.origin.y = frameOfScreen.size.height - NSMaxY(rect) + (frameOfScreenWithMenuBar.size.height - frameOfScreen.size.height);
   return rect;
 }

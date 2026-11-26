@@ -1,7 +1,5 @@
 #import "SpectacleAppDelegate.h"
 
-#import <Sparkle/Sparkle.h>
-
 #import "SpectacleAccessibilityElement.h"
 #import "SpectacleDefaultShortcutHelpers.h"
 #import "SpectacleMigratingShortcutStorage.h"
@@ -14,6 +12,12 @@
 #import "SpectacleUtilities.h"
 #import "SpectacleWindowPositionCalculator.h"
 #import "SpectacleWindowPositionManager.h"
+
+static BOOL SpectacleIsRunningUnitTests(void)
+{
+  return NSProcessInfo.processInfo.environment[@"XCTestConfigurationFilePath"] != nil
+    || NSClassFromString(@"XCTestCase") != Nil;
+}
 
 @implementation SpectacleAppDelegate
 {
@@ -31,6 +35,12 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+  // When the app is acting as the host for unit tests, skip all side effects: registering global
+  // hot keys, adding a status item, and (most importantly) presenting the modal accessibility
+  // dialog, which would block the test run indefinitely on a CI machine.
+  if (SpectacleIsRunningUnitTests()) {
+    return;
+  }
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
   NSNotificationCenter *workspaceNotificationCenter = [NSWorkspace sharedWorkspace].notificationCenter;
   [notificationCenter addObserver:self
@@ -87,14 +97,21 @@
                          @"RedoLastMove": _redoLastMoveShortcutMenuItem,
                          };
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  _blacklistedApplications = [NSSet setWithArray:[userDefaults objectForKey:@"BlacklistedApplications"]];
+  // Always disable shortcuts while Spectacle itself is frontmost so the shortcut recorder in the
+  // preferences window can capture key combinations that are already registered as hot keys.
+  NSMutableSet<NSString *> *blacklistedApplications = [NSMutableSet setWithArray:[userDefaults objectForKey:@"BlacklistedApplications"]];
+  NSString *ownBundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
+  if (ownBundleIdentifier) {
+    [blacklistedApplications addObject:ownBundleIdentifier];
+  }
+  _blacklistedApplications = blacklistedApplications;
   _disabledApplications = [NSMutableSet setWithArray:[userDefaults objectForKey:@"DisabledApplications"]];
   _shortcutStorage = [[SpectacleMigratingShortcutStorage alloc] initWithShortcutStorage:[SpectacleShortcutUserDefaultsStorage new]
                                                                    migrationDestination:[SpectacleShortcutJSONStorage new]];
   _shortcutManager = [[SpectacleShortcutManager alloc] initWithShortcutStorage:_shortcutStorage];
   SpectacleWindowPositionCalculator *windowPositionCalculator = [[SpectacleWindowPositionCalculator alloc] initWithErrorHandler:^(NSString *errorMessage) {
     NSAlert *alert = [NSAlert new];
-    alert.alertStyle = NSWarningAlertStyle;
+    alert.alertStyle = NSAlertStyleWarning;
     alert.messageText = @"Encountered an unexpected error";
     alert.informativeText = errorMessage;
     [alert runModal];
@@ -108,12 +125,10 @@
   _shortcutsAreDisabledForAnHour = NO;
   [self manageShortcuts];
   [self disableShortcutsIfFrontmostApplicationIsBlacklistedOrDisabled];
-  BOOL automaticallyChecksForUpdates = [userDefaults boolForKey:@"AutomaticUpdateCheckEnabled"];
   BOOL statusItemEnabled = [userDefaults boolForKey:@"StatusItemEnabled"];
   if (statusItemEnabled) {
     [self enableStatusItem];
   }
-  [[SUUpdater sharedUpdater] setAutomaticallyChecksForUpdates:automaticallyChecksForUpdates];
   [self updateShortcutMenuItems];
   if (!AXIsProcessTrustedWithOptions(NULL)) {
     [[NSApplication sharedApplication] runModalForWindow:self.accessiblityAccessDialogWindow];
@@ -240,12 +255,12 @@
 
 - (IBAction)disableOrEnableShortcutsForAnHour:(id)sender
 {
-  NSInteger newMenuItemState = NSMixedState;
+  NSControlStateValue newMenuItemState = NSControlStateValueMixed;
   if (_shortcutsAreDisabledForAnHour) {
     _shortcutsAreDisabledForAnHour = NO;
     [_disableShortcutsForAnHourTimer invalidate];
     [self enableShortcutsIfPermitted];
-    newMenuItemState = NSOffState;
+    newMenuItemState = NSControlStateValueOff;
   } else {
     _shortcutsAreDisabledForAnHour = YES;
     _disableShortcutsForAnHourTimer = [NSTimer scheduledTimerWithTimeInterval:3600
@@ -254,7 +269,7 @@
                                                                      userInfo:nil
                                                                       repeats:NO];
     [_shortcutManager unregisterShortcuts];
-    newMenuItemState = NSOnState;
+    newMenuItemState = NSControlStateValueOn;
   }
   self.disableShortcutsForAnHourMenuItem.state = newMenuItemState;
 }
@@ -262,28 +277,34 @@
 - (IBAction)disableOrEnableShortcutsForApplication:(id)sender
 {
   NSRunningApplication *frontmostApplication = [NSWorkspace sharedWorkspace].frontmostApplication;
-  if ([_disabledApplications containsObject:frontmostApplication.bundleIdentifier]) {
-    [_disabledApplications removeObject:frontmostApplication.bundleIdentifier];
+  NSString *bundleIdentifier = frontmostApplication.bundleIdentifier;
+  // Some processes (e.g. bare executables or certain Java apps) have no bundle identifier;
+  // inserting nil into the set would raise and crash Spectacle.
+  if (!bundleIdentifier) {
+    NSBeep();
+    return;
+  }
+  if ([_disabledApplications containsObject:bundleIdentifier]) {
+    [_disabledApplications removeObject:bundleIdentifier];
     [self enableShortcutsIfPermitted];
-    self.disableShortcutsForApplicationMenuItem.state = NSOffState;
+    self.disableShortcutsForApplicationMenuItem.state = NSControlStateValueOff;
   } else {
-    [_disabledApplications addObject:frontmostApplication.bundleIdentifier];
+    [_disabledApplications addObject:bundleIdentifier];
     [_shortcutManager unregisterShortcuts];
-    self.disableShortcutsForApplicationMenuItem.state = NSOnState;
+    self.disableShortcutsForApplicationMenuItem.state = NSControlStateValueOn;
   }
   [NSUserDefaults.standardUserDefaults setObject:_disabledApplications.allObjects forKey:@"DisabledApplications"];
 }
 
 - (IBAction)openSystemPreferences:(id)sender
 {
-  NSURL *preferencePaneURL = [NSURL fileURLWithPath:[SpectacleUtilities pathForPreferencePaneNamed:@"Security"]];
-  NSBundle *applicationBundle = NSBundle.mainBundle;
-  NSURL *scriptURL = [applicationBundle URLForResource:@"Security & Privacy System Preferences" withExtension:@"scpt"];
+  // This URL opens Privacy & Security > Accessibility in both System Preferences (macOS 12 and
+  // earlier) and System Settings (macOS 13+). It replaces a bundled AppleScript that drove the old
+  // Security.prefPane UI, which no longer exists and required an extra Automation permission.
+  NSURL *accessibilitySettingsURL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"];
   [[NSApplication sharedApplication] stopModal];
   [self.accessiblityAccessDialogWindow orderOut:self];
-  if (![[[NSAppleScript alloc] initWithContentsOfURL:scriptURL error:nil] executeAndReturnError:nil]) {
-    [[NSWorkspace sharedWorkspace] openURL:preferencePaneURL];
-  }
+  [[NSWorkspace sharedWorkspace] openURL:accessibilitySettingsURL];
 }
 
 - (void)dealloc
@@ -307,18 +328,24 @@
 
 - (void)enableStatusItem
 {
+  if (_statusItem) {
+    return;
+  }
   _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
   NSImage *statusImage = [NSBundle.mainBundle imageForResource:@"Spectacle Status Item"];
   [statusImage setTemplate:YES];
-  _statusItem.highlightMode = YES;
-  _statusItem.image = statusImage;
+  _statusItem.button.image = statusImage;
+  _statusItem.button.toolTip = [@"Spectacle " stringByAppendingString:SpectacleUtilities.applicationVersion];
   _statusItem.menu = _statusItemMenu;
-  _statusItem.toolTip = [@"Spectacle " stringByAppendingString:SpectacleUtilities.applicationVersion];
 }
 
 - (void)disableStatusItem
 {
+  if (!_statusItem) {
+    return;
+  }
   [NSStatusBar.systemStatusBar removeStatusItem:_statusItem];
+  _statusItem = nil;
 }
 
 - (void)updateShortcutMenuItems
@@ -392,9 +419,9 @@
       [NSString stringWithFormat:NSLocalizedString(@"MenuItemTitleDisableShortcutsForApplication", @"The menu item title that displays the application to disable shortcuts for"), frontmostApplication.localizedName];
   }
   if ([_disabledApplications containsObject:frontmostApplication.bundleIdentifier]) {
-    self.disableShortcutsForApplicationMenuItem.state = NSOnState;
+    self.disableShortcutsForApplicationMenuItem.state = NSControlStateValueOn;
   } else {
-    self.disableShortcutsForApplicationMenuItem.state = NSOffState;
+    self.disableShortcutsForApplicationMenuItem.state = NSControlStateValueOff;
   }
 }
 

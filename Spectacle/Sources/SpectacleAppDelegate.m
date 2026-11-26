@@ -1,5 +1,7 @@
 #import "SpectacleAppDelegate.h"
 
+#import "Spectacle-Swift.h"
+
 #import "SpectacleAccessibilityElement.h"
 #import "SpectacleDefaultShortcutHelpers.h"
 #import "SpectacleMigratingShortcutStorage.h"
@@ -31,6 +33,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
   NSSet<NSString *> *_blacklistedApplications;
   NSMutableSet<NSString *> *_disabledApplications;
   BOOL _shortcutsAreDisabledForAnHour;
+  SpectacleAccessibilityPermission *_accessibilityPermission;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
@@ -129,9 +132,7 @@ static BOOL SpectacleIsRunningUnitTests(void)
     [self enableStatusItem];
   }
   [self updateShortcutMenuItems];
-  if (!AXIsProcessTrustedWithOptions(NULL)) {
-    [[NSApplication sharedApplication] runModalForWindow:self.accessiblityAccessDialogWindow];
-  }
+  [self showAccessibilityAccessDialogIfNeeded];
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)application hasVisibleWindows:(BOOL)visibleWindows
@@ -300,10 +301,27 @@ static BOOL SpectacleIsRunningUnitTests(void)
   // This URL opens Privacy & Security > Accessibility in both System Preferences (macOS 12 and
   // earlier) and System Settings (macOS 13+). It replaces a bundled AppleScript that drove the old
   // Security.prefPane UI, which no longer exists and required an extra Automation permission.
+  // The dialog stays open as a reminder and closes itself once access is granted.
   NSURL *accessibilitySettingsURL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"];
-  [[NSApplication sharedApplication] stopModal];
-  [self.accessiblityAccessDialogWindow orderOut:self];
   [[NSWorkspace sharedWorkspace] openURL:accessibilitySettingsURL];
+}
+
+- (void)showAccessibilityAccessDialogIfNeeded
+{
+  if (SpectacleAccessibilityPermission.isGranted) {
+    return;
+  }
+  // The dialog used to be app-modal, which blocked the menu bar item and preferences until the
+  // user clicked a button, and never noticed when access was granted. Now it is an ordinary window
+  // that closes itself as soon as access is granted.
+  NSWindow *dialog = self.accessiblityAccessDialogWindow;
+  [dialog center];
+  [NSApp activateIgnoringOtherApps:YES];
+  [dialog makeKeyAndOrderFront:self];
+  _accessibilityPermission = [SpectacleAccessibilityPermission new];
+  [_accessibilityPermission waitUntilGrantedCheckingEvery:1.0 completion:^{
+    [dialog orderOut:nil];
+  }];
 }
 
 - (void)dealloc

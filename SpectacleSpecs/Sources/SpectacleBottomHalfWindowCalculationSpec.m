@@ -1,39 +1,56 @@
-#import <Expecta/Expecta.h>
-#import <Specta/Specta.h>
+#import <XCTest/XCTest.h>
 
+#import "SpectacleTestHelpers.h"
 #import "SpectacleWindowPositionCalculationResult.h"
 #import "SpectacleWindowPositionCalculator.h"
 
-SpecBegin(SpectacleBottomHalfWindowCalculation)
-describe(@"SpectacleBottomHalfWindowCalculation", ^{
-  CGRect visibleFrameSourceScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
-  CGRect visibleFrameDestinationScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
-  SpectacleWindowPositionCalculator *windowPositionCalculator = [[SpectacleWindowPositionCalculator alloc] initWithErrorHandler:^(NSString *message) {
-    EXP_failure(message);
+@interface SpectacleBottomHalfWindowCalculationTests : XCTestCase
+@end
+
+@implementation SpectacleBottomHalfWindowCalculationTests
+{
+  CGRect visibleFrameSourceScreen;
+  CGRect visibleFrameDestinationScreen;
+  SpectacleWindowPositionCalculator *windowPositionCalculator;
+}
+
+- (void)setUp
+{
+  [super setUp];
+  visibleFrameSourceScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
+  visibleFrameDestinationScreen = CGRectMake(0.0f, 4.0f, 1440.0f, 873.0f);
+  __weak __typeof__(self) weakSelf = self;
+  windowPositionCalculator = [[SpectacleWindowPositionCalculator alloc] initWithErrorHandler:^(NSString *message) {
+    __strong __typeof__(weakSelf) self = weakSelf;
+    XCTFail(@"%@", message);
   }];
+}
 
-  it(@"should calculate a window's CGRect in the bottom half of the screen", ^{
-    SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(165.0f, 245.0f, 564.0f, 384.0f)
-                                                                          visibleFrameOfSourceScreen:visibleFrameSourceScreen
-                                                                     visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
-                                                                                              action:kSpectacleWindowActionBottomHalf];
-    expect(result.windowRect).to.equal(CGRectMake(0.0f, 4.0f, 1440.0f, 436.0f));
-  });
+- (void)testCalculateAWindowsCGRectInTheBottomHalfOfTheScreen
+{
+  SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(165.0f, 245.0f, 564.0f, 384.0f)
+                                                                        visibleFrameOfSourceScreen:visibleFrameSourceScreen
+                                                                   visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
+                                                                                            action:kSpectacleWindowActionBottomHalf];
+  SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 436.0f));
+}
 
-  it(@"should calculate a window's CGRect in the bottom 2/3 of the screen", ^{
-    SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 436.0f)
-                                                                          visibleFrameOfSourceScreen:visibleFrameSourceScreen
-                                                                     visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
-                                                                                              action:kSpectacleWindowActionBottomHalf];
-    expect(result.windowRect).to.equal(CGRectMake(0.0f, 4.0f, 1440.0f, 582.0f));
-  });
+- (void)testCalculateAWindowsCGRectInTheBottomTwoThirdsOfTheScreen
+{
+  SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 436.0f)
+                                                                        visibleFrameOfSourceScreen:visibleFrameSourceScreen
+                                                                   visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
+                                                                                            action:kSpectacleWindowActionBottomHalf];
+  SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 582.0f));
+}
 
-  it(@"should calculate a window's CGRect in the bottom 1/3 of the screen", ^{
-    SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 582.0f)
-                                                                          visibleFrameOfSourceScreen:visibleFrameSourceScreen
-                                                                     visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
-                                                                                              action:kSpectacleWindowActionBottomHalf];
-    expect(result.windowRect).to.equal(CGRectMake(0.0f, 4.0f, 1440.0f, 291.0f));
-  });
-});
-SpecEnd
+- (void)testCalculateAWindowsCGRectInTheBottomOneThirdOfTheScreen
+{
+  SpectacleWindowPositionCalculationResult *result = [windowPositionCalculator calculateWindowRect:CGRectMake(0.0f, 4.0f, 1440.0f, 582.0f)
+                                                                        visibleFrameOfSourceScreen:visibleFrameSourceScreen
+                                                                   visibleFrameOfDestinationScreen:visibleFrameDestinationScreen
+                                                                                            action:kSpectacleWindowActionBottomHalf];
+  SpectacleAssertEqualRects(result.windowRect, CGRectMake(0.0f, 4.0f, 1440.0f, 291.0f));
+}
+
+@end

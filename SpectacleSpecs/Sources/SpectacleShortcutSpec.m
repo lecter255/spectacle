@@ -86,12 +86,15 @@
   XCTAssertNotEqualObjects(shortcut1, clearedShortcut);
 }
 
-- (void)testDetermineIfTheShortcutIsContainsModifiers
+// -containsModifiers: is an exact match (it is used to detect clashes with system-wide shortcuts,
+// where ⌘Space and ⌥⌘Space don't conflict). The upstream spec expected subset semantics and
+// failed against the upstream implementation; it was never caught because upstream CI was dead.
+- (void)testDetermineIfTheShortcutHasExactlyTheGivenModifiers
 {
   SpectacleShortcut *shortcut = [[SpectacleShortcut alloc] initWithShortcutName:@"MoveToCenter"
                                                                 shortcutKeyCode:kVK_ANSI_C
                                                               shortcutModifiers:NSEventModifierFlagOption | NSEventModifierFlagCommand];
-  XCTAssertTrue([shortcut containsModifiers:NSEventModifierFlagOption]);
+  XCTAssertFalse([shortcut containsModifiers:NSEventModifierFlagOption]);
   XCTAssertTrue([shortcut containsModifiers:NSEventModifierFlagOption | NSEventModifierFlagCommand]);
   XCTAssertFalse([shortcut containsModifiers:NSEventModifierFlagControl]);
 }

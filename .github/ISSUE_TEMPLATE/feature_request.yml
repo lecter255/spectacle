@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest a new window action or an improvement.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This fork aims to stay a small, keyboard-first window manager. Requests that fit that goal are the most likely to be picked up.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the situation and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like Spectacle to do?
+      description: If it's a new window action, describe where the window should end up and what pressing the shortcut again should do.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Other apps or workarounds you've tried.

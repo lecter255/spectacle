@@ -1,0 +1,52 @@
+name: Bug report
+description: A window lands in the wrong place, a shortcut doesn't work, or the app misbehaves.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! This is a community fork. Please don't report issues with it to the original Spectacle project.
+        Window bugs are usually specific to an app or a display setup, so the details below really help.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead. A screenshot or screen recording helps a lot.
+    validations:
+      required: true
+  - type: input
+    id: action
+    attributes:
+      label: Window action and shortcut
+      placeholder: "e.g. Left Half, ⌥⌘←"
+  - type: input
+    id: app
+    attributes:
+      label: Which app's window?
+      placeholder: "e.g. Safari 18.1, iTerm2 3.5"
+  - type: input
+    id: spectacle-version
+    attributes:
+      label: Spectacle version
+      description: Shown in the title of the Preferences window, or the menu bar icon's tooltip.
+    validations:
+      required: true
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      placeholder: "e.g. macOS 15.1 (24B83)"
+    validations:
+      required: true
+  - type: textarea
+    id: displays
+    attributes:
+      label: Displays
+      description: How many displays, their resolutions, and how they're arranged in System Settings > Displays. Mention Stage Manager if it's on.
+      placeholder: "e.g. MacBook Pro built-in display, plus a 27\" 4K display to its right"
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: Anything from Spectacle in Console.app (filter by "Spectacle").
+      render: text

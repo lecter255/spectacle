@@ -69,6 +69,7 @@
 		8ACFC11844C68C532C63539B /* WindowResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9840DBC5A2BCE7C21E5DDA01 /* WindowResizer.swift */; };
 		092855FF2A8965B0CBB456E0 /* SpectacleWindowLayoutBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68761428070F746922ED5830 /* SpectacleWindowLayoutBridge.swift */; };
 		83C55128225C57C9A9C8FC4C /* SpectacleAccessibilityPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AE708730390AED29FF9956 /* SpectacleAccessibilityPermission.swift */; };
+		29D02FC9F7A38CD23B52FAD0 /* ScreenSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D035EF52BF983B531D7D867 /* ScreenSelection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -208,6 +209,7 @@
 		9840DBC5A2BCE7C21E5DDA01 /* WindowResizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WindowResizer.swift; path = SpectacleCore/Sources/SpectacleCore/WindowResizer.swift; sourceTree = "<group>"; };
 		68761428070F746922ED5830 /* SpectacleWindowLayoutBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleWindowLayoutBridge.swift; path = Spectacle/Sources/SpectacleWindowLayoutBridge.swift; sourceTree = "<group>"; };
 		02AE708730390AED29FF9956 /* SpectacleAccessibilityPermission.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpectacleAccessibilityPermission.swift; path = Spectacle/Sources/SpectacleAccessibilityPermission.swift; sourceTree = "<group>"; };
+		1D035EF52BF983B531D7D867 /* ScreenSelection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScreenSelection.swift; path = SpectacleCore/Sources/SpectacleCore/ScreenSelection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -488,6 +490,7 @@
 		7C13004E0239AD8C5622A05C /* SpectacleCore */ = {
 			isa = PBXGroup;
 			children = (
+				1D035EF52BF983B531D7D867 /* ScreenSelection.swift */,
 				BE24BD1D5136E53BB76DFD08 /* Rect.swift */,
 				48DED59E451E734BEEC4291C /* WindowAction.swift */,
 				EFB2ADD347F838CD12F66DC1 /* WindowLayout.swift */,
@@ -650,6 +653,7 @@
 				2D7CF9EB1C6FED50004DC708 /* SpectacleWindowPositionCalculator.m in Sources */,
 				2D8DA058147E113D003BE1D3 /* SpectacleWindowPositionManager.m in Sources */,
 				3023F8468B7644F5E33999EE /* Rect.swift in Sources */,
+				29D02FC9F7A38CD23B52FAD0 /* ScreenSelection.swift in Sources */,
 				077D94FF2D73BE33C44824A2 /* WindowAction.swift in Sources */,
 				683B158C431F9BD4D9D5D86B /* WindowLayout.swift in Sources */,
 				8ACFC11844C68C532C63539B /* WindowResizer.swift in Sources */,

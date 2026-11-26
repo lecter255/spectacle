@@ -56,7 +56,7 @@ Windows can be moved to a number of predefined regions of the screen:
 - _Move to the upper right_ &#8212; &#8963;&#8984;&#8594;
 - _Move to the lower right_ &#8212; &#8963;&#8679;&#8984;&#8594;
 
-Windows may also be resized between thirds using any of the shortcuts above. For example, to have a window resized between 1/3 and 2/3 of the left region of the screen simply activate the *left half* &#8997;&#8984;&#8592; keyboard shortcut more than once. Each time the shortcut is activated Spectacle will move the window between 1/3, 2/3, and back to 1/2 of the left side of the screen. This feature also applies to the upper left, lower left, upper right, and lower right shortcuts.
+Windows may also be resized between quarters and thirds using any of the shortcuts above. For example, to make a window take up a different share of the left side of the screen, activate the *left half* &#8997;&#8984;&#8592; keyboard shortcut more than once. The first press snaps the window to 1/2; each further press steps through 2/3, 3/4, 1/4 and 1/3 before returning to 1/2. This works the same way for the right, top and bottom half shortcuts, and for the upper left, lower left, upper right, and lower right shortcuts (which change the width while keeping half the screen height).
 
 Spectacle can also move windows between horizontal and vertical thirds of the screen. The &#8963;&#8997;&#8594; keyboard shortcut will move a window to the next third of the screen, starting with the horizontal third region on the left of the screen. &#8963;&#8997;&#8592; will move a window to the previous third of the screen.
 

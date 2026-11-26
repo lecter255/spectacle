@@ -379,6 +379,12 @@ struct GeneralSettings: View {
           model.restoreDefaults()
         }
       }
+      SettingsGroup(title: "Help") {
+        Button("Show Welcome Tour") {
+          NotificationCenter.default.post(
+            name: Notification.Name(SpectacleOnboardingWindowController.showNotificationName), object: nil)
+        }
+      }
       Spacer()
       Text("\(appDisplayName) is based on Spectacle by Eric Czarny, released under the MIT License.")
         .font(.system(size: 11))

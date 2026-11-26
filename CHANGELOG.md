@@ -14,6 +14,11 @@ specific to this fork.
 
 ### Interface
 
+- A new settings window replaces the old preferences window. The Layouts tab shows every shortcut
+  as a card, grouped into halves, corners, center/fill/size, thirds, displays and history; selecting
+  one opens an inspector with its shortcut recorder and, for halves and corners, the sizes it steps
+  through. The General tab holds launch at login, the menu bar icon, Appearance (Match System,
+  Light, Dark), the snap HUD toggle and Restore Default Shortcuts.
 - Clicking the menu bar icon opens a layout panel instead of a long menu: a grid of 12 layouts
   for the front window with its current layout highlighted, its size with one-click size chips
   (¼ ⅓ ½ ⅔ ¾) for halves and corners, Display and Undo buttons, Edit Shortcuts and Quit. The panel

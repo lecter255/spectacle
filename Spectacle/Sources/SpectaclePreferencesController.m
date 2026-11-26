@@ -1,7 +1,6 @@
 #import "SpectaclePreferencesController.h"
 
-#import <QuartzCore/QuartzCore.h>
-
+#import "Spectacle-Swift.h"
 #import "SpectacleAccessibilityElement.h"
 #import "SpectacleDefaultShortcutHelpers.h"
 #import "SpectacleLoginItemHelper.h"
@@ -14,67 +13,55 @@
 #import "SpectacleUtilities.h"
 #import "SpectacleWindowPositionManager.h"
 
+@interface SpectaclePreferencesController () <SpectacleSettingsDataSource>
+@end
+
 @implementation SpectaclePreferencesController
 {
   SpectacleShortcutManager *_shortcutManager;
   SpectacleWindowPositionManager *_windowPositionManager;
   id<SpectacleShortcutStorage> _shortcutStorage;
   NSDictionary<NSString *, SpectacleShortcutRecorder *> *_shortcutRecorders;
+  SpectacleSettingsWindowController *_settingsWindowController;
 }
 
 - (instancetype)initWithShortcutManager:(SpectacleShortcutManager *)shortcutManager
                   windowPositionManager:(SpectacleWindowPositionManager *)windowPositionManager
                         shortcutStorage:(id<SpectacleShortcutStorage>)shortcutStorage
 {
-  if (self = [super initWithWindowNibName:@"SpectaclePreferencesWindow"]) {
+  if (self = [super initWithWindow:nil]) {
     _shortcutManager = shortcutManager;
     _windowPositionManager = windowPositionManager;
     _shortcutStorage = shortcutStorage;
+    NSMutableDictionary<NSString *, SpectacleShortcutRecorder *> *shortcutRecorders = [NSMutableDictionary new];
+    for (NSString *shortcutName in @[@"MoveToCenter", @"MoveToFullscreen", @"MoveToLeftHalf", @"MoveToRightHalf",
+                                     @"MoveToTopHalf", @"MoveToBottomHalf", @"MoveToUpperLeft", @"MoveToLowerLeft",
+                                     @"MoveToUpperRight", @"MoveToLowerRight", @"MoveToNextDisplay",
+                                     @"MoveToPreviousDisplay", @"MoveToNextThird", @"MoveToPreviousThird",
+                                     @"MakeLarger", @"MakeSmaller", @"UndoLastMove", @"RedoLastMove"]) {
+      shortcutRecorders[shortcutName] = [[SpectacleShortcutRecorder alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+    }
+    _shortcutRecorders = shortcutRecorders;
+    [self loadRegisteredShortcuts];
+    _settingsWindowController = [[SpectacleSettingsWindowController alloc] initWithDataSource:self];
+    self.window = _settingsWindowController.window;
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(loadRegisteredShortcuts)
+                               name:@"SpectacleShortcutChangedNotification"
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(loadRegisteredShortcuts)
+                               name:@"SpectacleRestoreDefaultShortcutsNotification"
+                             object:nil];
   }
   return self;
 }
 
-- (void)windowDidLoad
+- (void)showWindow:(id)sender
 {
-  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-  NSControlStateValue loginItemEnabledState = NSControlStateValueOff;
-  BOOL isStatusItemEnabled = [NSUserDefaults.standardUserDefaults boolForKey:@"StatusItemEnabled"];
-  _shortcutRecorders = @{
-                         @"MoveToCenter": _moveToCenterShortcutRecorder,
-                         @"MoveToFullscreen": _moveToFullscreenShortcutRecorder,
-                         @"MoveToLeftHalf": _moveToLeftShortcutRecorder,
-                         @"MoveToRightHalf": _moveToRightShortcutRecorder,
-                         @"MoveToTopHalf": _moveToTopShortcutRecorder,
-                         @"MoveToBottomHalf": _moveToBottomShortcutRecorder,
-                         @"MoveToUpperLeft": _moveToUpperLeftShortcutRecorder,
-                         @"MoveToLowerLeft": _moveToLowerLeftShortcutRecorder,
-                         @"MoveToUpperRight": _moveToUpperRightShortcutRecorder,
-                         @"MoveToLowerRight": _moveToLowerRightShortcutRecorder,
-                         @"MoveToNextDisplay": _moveToNextDisplayShortcutRecorder,
-                         @"MoveToPreviousDisplay": _moveToPreviousDisplayShortcutRecorder,
-                         @"MoveToNextThird": _moveToNextThirdShortcutRecorder,
-                         @"MoveToPreviousThird": _moveToPreviousThirdShortcutRecorder,
-                         @"MakeLarger": _makeLargerShortcutRecorder,
-                         @"MakeSmaller": _makeSmallerShortcutRecorder,
-                         @"UndoLastMove": _undoLastMoveShortcutRecorder,
-                         @"RedoLastMove": _redoLastMoveShortcutRecorder,
-                         };
-  [self loadRegisteredShortcuts];
-  [notificationCenter addObserver:self
-                         selector:@selector(loadRegisteredShortcuts)
-                             name:@"SpectacleShortcutChangedNotification"
-                           object:nil];
-  [notificationCenter addObserver:self
-                         selector:@selector(loadRegisteredShortcuts)
-                             name:@"SpectacleRestoreDefaultShortcutsNotification"
-                           object:nil];
-  if ([SpectacleLoginItemHelper isLoginItemEnabledForBundle:NSBundle.mainBundle]) {
-    loginItemEnabledState = NSControlStateValueOn;
-  }
-  self.loginItemEnabled.state = loginItemEnabledState;
-  [self.statusItemEnabled selectItemWithTag:isStatusItemEnabled ? 0 : 1];
-  self.window.title = [@"Spectacle " stringByAppendingString:SpectacleUtilities.applicationVersion];
-  self.footerView.wantsLayer = YES;
+  [_settingsWindowController reload];
+  [super showWindow:sender];
 }
 
 - (void)shortcutRecorder:(SpectacleShortcutRecorder *)shortcutRecorder
@@ -108,27 +95,26 @@ didClearExistingShortcut:(SpectacleShortcut *)shortcut
                                                                    [SpectacleRegisteredShortcutValidator new],
                                                                    ]];
   }
+  [_settingsWindowController reload];
 }
 
-- (IBAction)swapFooterViews:(id)sender
+#pragma mark - SpectacleSettingsDataSource
+
+- (NSView *)settingsShortcutRecorderForShortcutName:(NSString *)shortcutName
 {
-  CATransition *transition = [CATransition animation];
-  NSView *currentFooterView = self.footerView.subviews[0];
-  NSView *nextFooterView = nil;
-  transition.type = kCATransitionPush;
-  if (currentFooterView == self.shortcutModifierLegendFooterView) {
-    nextFooterView = self.optionsFooterView;
-    transition.subtype = kCATransitionFromRight;
-  } else {
-    nextFooterView = self.shortcutModifierLegendFooterView;
-    transition.subtype = kCATransitionFromLeft;
-  }
-  self.footerView.animations = @{@"subviews": transition};
-  [self.footerView.animator replaceSubview:currentFooterView
-                                      with:nextFooterView];
+  return _shortcutRecorders[shortcutName] ?: [NSView new];
 }
 
-- (IBAction)restoreDefaults:(id)sender
+- (NSString *)settingsShortcutDisplayStringForShortcutName:(NSString *)shortcutName
+{
+  SpectacleShortcut *shortcut = [_shortcutManager shortcutForShortcutName:shortcutName];
+  if (!shortcut || shortcut.isClearedShortcut) {
+    return nil;
+  }
+  return shortcut.displayString;
+}
+
+- (void)settingsRestoreDefaultShortcuts
 {
   [SpectacleUtilities displayRestoreDefaultsAlertWithConfirmationCallback:^() {
     NSArray<SpectacleShortcut *> *shortcuts = SpectacleDefaultShortcutsWithAction(^(SpectacleShortcut *shortcut) {
@@ -141,42 +127,45 @@ didClearExistingShortcut:(SpectacleShortcut *)shortcut
   }];
 }
 
-- (IBAction)toggleLoginItem:(id)sender
+- (BOOL)settingsIsLoginItemEnabled
 {
-  NSBundle *applicationBundle = NSBundle.mainBundle;
-  if (self.loginItemEnabled.state == NSControlStateValueOn) {
-    [SpectacleLoginItemHelper enableLoginItemForBundle:applicationBundle];
+  return [SpectacleLoginItemHelper isLoginItemEnabledForBundle:NSBundle.mainBundle];
+}
+
+- (void)settingsSetLoginItemEnabled:(BOOL)enabled
+{
+  if (enabled) {
+    [SpectacleLoginItemHelper enableLoginItemForBundle:NSBundle.mainBundle];
   } else {
-    [SpectacleLoginItemHelper disableLoginItemForBundle:applicationBundle];
+    [SpectacleLoginItemHelper disableLoginItemForBundle:NSBundle.mainBundle];
   }
 }
 
-- (IBAction)toggleStatusItem:(id)sender
+- (BOOL)settingsIsStatusItemEnabled
 {
-  NSString *notificationName = @"SpectacleStatusItemEnabledNotification";
-  BOOL isStatusItemEnabled = YES;
-  __block BOOL statusItemStateChanged = YES;
+  return [NSUserDefaults.standardUserDefaults boolForKey:@"StatusItemEnabled"];
+}
+
+- (void)settingsSetStatusItemEnabled:(BOOL)enabled
+{
   NSUserDefaults *userDefaults = NSUserDefaults.standardUserDefaults;
-  if ([userDefaults boolForKey:@"StatusItemEnabled"] == ([[sender selectedItem] tag] == 0)) {
+  if ([userDefaults boolForKey:@"StatusItemEnabled"] == enabled) {
     return;
   }
-  if ([sender selectedItem].tag != 0) {
-    notificationName = @"SpectacleStatusItemDisabledNotification";
-    isStatusItemEnabled = NO;
-    if (![userDefaults boolForKey:@"BackgroundAlertSuppressed"]) {
-      [SpectacleUtilities displayRunningInBackgroundAlertWithCallback:^(BOOL isConfirmed, BOOL isSuppressed) {
-        if (!isConfirmed) {
-          statusItemStateChanged = NO;
-          [sender selectItemWithTag:0];
-        }
-        [userDefaults setBool:isSuppressed forKey:@"BackgroundAlertSuppressed"];
-      }];
-    }
+  __block BOOL confirmed = YES;
+  if (!enabled && ![userDefaults boolForKey:@"BackgroundAlertSuppressed"]) {
+    // Hiding the icon leaves the app running with no visible way back, so say how to return.
+    [SpectacleUtilities displayRunningInBackgroundAlertWithCallback:^(BOOL isConfirmed, BOOL isSuppressed) {
+      confirmed = isConfirmed;
+      [userDefaults setBool:isSuppressed forKey:@"BackgroundAlertSuppressed"];
+    }];
   }
-  if (statusItemStateChanged) {
-    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self];
-    [userDefaults setBool:isStatusItemEnabled forKey:@"StatusItemEnabled"];
+  if (!confirmed) {
+    return;
   }
+  [userDefaults setBool:enabled forKey:@"StatusItemEnabled"];
+  NSString *notificationName = enabled ? @"SpectacleStatusItemEnabledNotification" : @"SpectacleStatusItemDisabledNotification";
+  [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self];
 }
 
 - (void)dealloc

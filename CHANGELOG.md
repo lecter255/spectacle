@@ -15,7 +15,7 @@ specific to this fork.
 
 ### Build and tooling
 
-- Builds on current Xcode and macOS SDKs. The minimum deployment target is now macOS 10.13, the
+- Builds on current Xcode and macOS SDKs. The minimum deployment target was raised to macOS 10.13, the
   oldest version current Xcode can target (previously 10.9).
 - Removed Carthage and every third-party dependency.
 - Ported the test suite from Specta/Expecta/OCMockito (all unmaintained) to plain XCTest with
@@ -28,17 +28,16 @@ specific to this fork.
 - Replaced APIs deprecated as of macOS 10.13 so the project still builds with warnings treated
   as errors.
 
-- Added fast window-geometry tests that run the bundled JavaScript under Node on Linux
-  (`Tests/geometry/`). They replay every case from the XCTest calculation specs and check
-  invariants such as "windows stay on screen" across several display layouts.
 - CI uploads an unsigned Release build of the app on every run, for testing on a real Mac.
 - Removed an unused asset set that worked around a macOS 10.9 crash.
 - Added GitHub issue templates for bug reports and feature requests.
 
-- Started a gradual port to Swift. `SpectacleCore` is a new Swift package with the window layout
-  logic, ported from the bundled JavaScript and tested against every case in the existing specs.
-  It has no macOS dependencies, so it is built and tested on Linux in CI. The app doesn't use it
-  yet.
+- Started a gradual port to Swift. The window layout logic now lives in `SpectacleCore`, a Swift
+  package ported from the bundled JavaScript and tested against every case in the existing specs.
+  It has no macOS dependencies, so it is also built and tested on Linux in CI. The app uses it in
+  place of the JavaScript calculations, which (with JavaScriptCore) have been removed.
+- The minimum macOS version is now 11 (Big Sur), up from 10.13, so the app can use the Swift
+  runtime built into macOS and, later, SwiftUI.
 
 ### Fork identity and security
 
@@ -70,8 +69,5 @@ specific to this fork.
 - The order of displays for "Next Display" and "Previous Display" is now well defined. The sort
   comparator returned raw coordinate differences instead of an ordering, which the sort doesn't
   support.
-- An error in a window position script is now logged to Console instead of interrupting you with
-  a modal alert, and the window is left where it was. Previously the window could be moved to a
-  zero-size frame at the corner of the screen.
 - Spectacle always ignores its own shortcuts while it is the frontmost app, whatever its bundle
   identifier, so the shortcut recorder keeps working.

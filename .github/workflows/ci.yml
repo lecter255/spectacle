@@ -14,20 +14,6 @@ permissions:
   contents: read
 
 jobs:
-  geometry:
-    # Fast check of the window position math (the bundled JavaScript) on Linux. Runs every case from
-    # the XCTest calculation specs plus extra invariants in a few seconds; see Tests/geometry/.
-    name: Window geometry tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Run geometry tests
-        run: node --test Tests/geometry/geometry.test.mjs
-
   core:
     # SpectacleCore, the platform-independent Swift window layout package. Built and tested on Linux
     # to keep it free of macOS-only dependencies.

@@ -24,10 +24,7 @@ Including screenshots or videos are extremely helpful so please include them if 
 2. Add tests if your changes can and should be tested (tests use plain XCTest; see `SpectacleSpecs/`)
 3. Run the test suite and confirm that all tests pass:
    `xcodebuild -project Spectacle.xcodeproj -scheme Spectacle -destination 'platform=macOS' test`
-   - The app is being ported to Swift gradually. Window layout logic is moving into `SpectacleCore/`, a Swift package with no macOS dependencies; test it on macOS or Linux with `swift test --package-path SpectacleCore`.
-   - The window position math lives in JavaScript (`Spectacle/Resources/Window Position Calculations/`). You can test it on any OS, without Xcode, with Node 18 or later:
-     `node --test Tests/geometry/geometry.test.mjs`
-     This runs every case from the XCTest `*CalculationSpec.m` files plus a few invariants (windows stay on screen, sizes cycle correctly). Add new cases to the XCTest spec and they run in both suites.
+   - The app is being ported to Swift gradually. The window layout logic lives in `SpectacleCore/`, a Swift package with no macOS dependencies that the app compiles in directly. Test it on macOS or Linux, without Xcode, with `swift test --package-path SpectacleCore`. Its tests also replay every case in the XCTest `*CalculationSpec.m` files, so add new layout cases there.
 4. Rebase your changes on top of the most recent changes from `master`
 5. Make sure the GitHub Actions CI build passes on your pull request. Each CI run also uploads an unsigned build of the app (under the run's **Artifacts**) that you can try on a Mac.
 

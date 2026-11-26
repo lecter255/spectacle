@@ -23,7 +23,7 @@ Spectacle is distributed under the MIT License; see [LICENSE.md](LICENSE.md). Th
 
 ## System requirements
 
-macOS 10.13 (High Sierra) or later. Building requires a recent version of Xcode (CI builds with the default Xcode on GitHub's `macos-15` runner).
+macOS 11 (Big Sur) or later. Building requires a recent version of Xcode (CI builds with the default Xcode on GitHub's `macos-15` runner).
 
 ## Keyboard Shortcuts
 
